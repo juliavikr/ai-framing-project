@@ -1,5 +1,5 @@
 # AI Framing Research Project — CLAUDE.md
-# Bocconi University · Language Technology · 2025
+# Bocconi University · Language Technology · 2026
 
 ## Research Question
 To what extent do actors adapt their framing of AI across contexts
