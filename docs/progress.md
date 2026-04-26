@@ -141,77 +141,77 @@ H3 verdict (individuals > institutions in variance?): PENDING
 ### Week 1 — Data Collection (Days 1–7)
 
 Person A — individuals + scraping pipeline:
-  [ ] scrape_individuals.py ready and tested
-  [ ] Sam Altman — all 3 contexts (~380 docs)
-  [ ] Dario Amodei — all 3 contexts (~360 docs)
-  [ ] Jensen Huang — all 3 contexts (~330 docs)
-  [ ] Elon Musk — all 3 contexts (~300 docs)
-  [ ] Mark Zuckerberg — all 3 contexts (~330 docs)
-  [ ] Demis Hassabis — all 3 contexts (~300 docs)
+  - [ ] scrape_individuals.py ready and tested
+  - [ ] Sam Altman — all 3 contexts (~380 docs)
+  - [ ] Dario Amodei — all 3 contexts (~360 docs)
+  - [ ] Jensen Huang — all 3 contexts (~330 docs)
+  - [ ] Elon Musk — all 3 contexts (~300 docs)
+  - [ ] Mark Zuckerberg — all 3 contexts (~330 docs)
+  - [ ] Demis Hassabis — all 3 contexts (~300 docs)
 
 Person B — companies + policymakers + data pipeline:
-  [ ] Snowflake: AI_FRAMING.PUBLIC.CORPUS table created
-  [ ] clean_and_dedupe.py tested on first batch
-  [ ] build_corpus.py schema validation working
-  [ ] OpenAI — all 3 contexts (~370 docs)
-  [ ] Anthropic — all 3 contexts (~350 docs)
-  [ ] Google DeepMind — all 3 contexts (~330 docs)
-  [ ] Meta AI — all 3 contexts (~320 docs)
-  [ ] Microsoft — all 3 contexts (~320 docs)
-  [ ] Nvidia — all 3 contexts (~310 docs)
-  [ ] EU Commission — policy + public (~480 docs)
-  [ ] US Congress — policy + public (~450 docs)
-  [ ] UK DSIT — policy + public (~430 docs)
-  [ ] White House OSTP — policy + public (~430 docs)
+  - [ ] Snowflake: AI_FRAMING.PUBLIC.CORPUS table created
+  - [ ] clean_and_dedupe.py tested on first batch
+  - [ ] build_corpus.py schema validation working
+  - [ ] OpenAI — all 3 contexts (~370 docs)
+  - [ ] Anthropic — all 3 contexts (~350 docs)
+  - [ ] Google DeepMind — all 3 contexts (~330 docs)
+  - [ ] Meta AI — all 3 contexts (~320 docs)
+  - [ ] Microsoft — all 3 contexts (~320 docs)
+  - [ ] Nvidia — all 3 contexts (~310 docs)
+  - [ ] EU Commission — policy + public (~480 docs)
+  - [ ] US Congress — policy + public (~450 docs)
+  - [ ] UK DSIT — policy + public (~430 docs)
+  - [ ] White House OSTP — policy + public (~430 docs)
 
 Both — end of week:
-  [ ] Balance report: all actors >= 80% of target
-  [ ] corpus.csv loaded to Snowflake
-  [ ] No actor exceeds 10% of corpus
+  - [ ] Balance report: all actors >= 80% of target
+  - [ ] corpus.csv loaded to Snowflake
+  - [ ] No actor exceeds 10% of corpus
 
 ### Week 2 — Annotation (Days 8–14)
 
-  [ ] Read annotation_guidelines.md together — both sign off verbally
-  [ ] Agree gold set stratification: 100 sent/context, 4+ actors per context
-  [ ] Person A: annotate 300 sentences → gold_set_person_a.csv
-  [ ] Person B: annotate 300 sentences → gold_set_person_b.csv (independently)
-  [ ] compute_kappa.py → κ = ___
-  [ ] κ >= 0.70? If NO: identify disagreements, revise guidelines, re-annotate
-  [ ] LLM pipeline: test on 50 sentences, accuracy = ___%
-  [ ] Full LLM labeling run on all ~6,000 docs
-  [ ] validate_llm_labels.py on held-out 100 → accuracy = ___%
+  - [ ] Read annotation_guidelines.md together — both sign off verbally
+  - [ ] Agree gold set stratification: 100 sent/context, 4+ actors per context
+  - [ ] Person A: annotate 300 sentences → gold_set_person_a.csv
+  - [ ] Person B: annotate 300 sentences → gold_set_person_b.csv (independently)
+  - [ ] compute_kappa.py → κ = ___
+  - [ ] κ >= 0.70? If NO: identify disagreements, revise guidelines, re-annotate
+  - [ ] LLM pipeline: test on 50 sentences, accuracy = ___%
+  - [ ] Full LLM labeling run on all ~6,000 docs
+  - [ ] validate_llm_labels.py on held-out 100 → accuracy = ___%
 
 ### Week 3 — Analysis (Days 15–21)
 
 Person A:
-  [ ] build_features.py — framing scores for all documents
-  [ ] regression.py --dv risk_score (Models 1, 2, 3)
-  [ ] regression.py --dv innovation_score
-  [ ] regression.py --dv regulation_score
-  [ ] All tables saved to outputs/tables/
+  - [ ] build_features.py — framing scores for all documents
+  - [ ] regression.py --dv risk_score (Models 1, 2, 3)
+  - [ ] regression.py --dv innovation_score
+  - [ ] regression.py --dv regulation_score
+  - [ ] All tables saved to outputs/tables/
 
 Person B:
-  [ ] variance_analysis.py — actor variance plot
-  [ ] Individual vs company pairs analysis
-  [ ] Robustness check (re-run Model 2 excluding actors < 150 docs)
-  [ ] All figures saved to outputs/figures/ at 300 dpi
+  - [ ] variance_analysis.py — actor variance plot
+  - [ ] Individual vs company pairs analysis
+  - [ ] Robustness check (re-run Model 2 excluding actors < 150 docs)
+  - [ ] All figures saved to outputs/figures/ at 300 dpi
 
 Both:
-  [ ] H1 verdict: is β_context significant? YES / NO
-  [ ] H2 verdict: commercial → innovation, policy → regulation? YES / NO
-  [ ] H3 verdict: individuals show more variance than institutions? YES / NO
+  - [ ] H1 verdict: is β_context significant? YES / NO
+  - [ ] H2 verdict: commercial → innovation, policy → regulation? YES / NO
+  - [ ] H3 verdict: individuals show more variance than institutions? YES / NO
 
 ### Week 4 — Write-up (Days 22–28)
 
-  [ ] Introduction + motivation (Altman example, strategic framing argument)
-  [ ] Related work (Entman 1993, computational framing studies, AI discourse lit)
-  [ ] Data section (corpus stats table, balance check, data sources)
-  [ ] Methodology (annotation protocol, Kappa score, LLM validation, regression spec)
-  [ ] Results (Model 1–3 tables, variance figure, H1/H2/H3 verdicts)
-  [ ] Discussion (who adapts most, does positioning predict consistency?)
-  [ ] Conclusion
-  [ ] All figures finalized
-  [ ] Submitted
+  - [ ] Introduction + motivation (Altman example, strategic framing argument)
+  - [ ] Related work (Entman 1993, computational framing studies, AI discourse lit)
+  - [ ] Data section (corpus stats table, balance check, data sources)
+  - [ ] Methodology (annotation protocol, Kappa score, LLM validation, regression spec)
+  - [ ] Results (Model 1–3 tables, variance figure, H1/H2/H3 verdicts)
+  - [ ] Discussion (who adapts most, does positioning predict consistency?)
+  - [ ] Conclusion
+  - [ ] All figures finalized
+  - [ ] Submitted
 
 ---
 
