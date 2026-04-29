@@ -68,8 +68,8 @@ ACTORS = {
         "contexts": {"commercial": 120, "policy": 120, "public": 120},
         "raw_subdir": "individuals/dario_amodei",
         "sources": {
-            "commercial": ["darioamodei.com", "anthropic.com/news"],
-            "policy": ["senate.gov testimony", "cfr.org events"],
+            "commercial": ["darioamodei.com", "anthropic.com/news", "anthropic.com/research"],
+            "policy": ["senate.gov testimony", "cfr.org events", "anthropic.com/policy"],
             "public": ["dwarkesh podcast", "lex fridman podcast", "cfr speeches"],
         },
     },
@@ -85,22 +85,37 @@ ACTORS = {
             "commercial": ["blogs.nvidia.com", "GTC keynote transcripts",
                            "nvidia earnings calls"],
             "policy": ["CSIS fireside chats", "Senate Banking Committee",
-                       "House Foreign Affairs meetings"],
-            "public": ["Stanford SIEPR", "Stratechery interviews", "press"],
+                       "House Foreign Affairs meetings", "nvidia.com/en-us/government"],
+            "public": ["Stanford SIEPR", "Stratechery interviews", "press",
+                       "nvidianews.nvidia.com"],
         },
     },
 
-    "Elon Musk": {
+    "Satya Nadella": {
         "type": "individual",
-        "positioning": "contrarian",
-        "pair": None,
+        "positioning": "capability",
+        "pair": "Microsoft",
         "target": 300,
-        "contexts": {"commercial": 100, "policy": 50, "public": 150},
-        "raw_subdir": "individuals/elon_musk",
+        "contexts": {"commercial": 120, "policy": 80, "public": 100},
+        "raw_subdir": "individuals/satya_nadella",
         "sources": {
-            "commercial": ["xAI blog", "Tesla earnings calls (AI sections)"],
-            "policy": ["Congressional record only — sparse"],
-            "public": ["long-form X posts", "press interviews", "podcasts"],
+            "commercial": [
+                "linkedin.com/in/satyanadella/",
+                "blogs.microsoft.com",
+                "microsoft.com/en-us/satyanadella",
+            ],
+            "policy": [
+                "senate.gov testimony",
+                "house committee transcripts",
+                "microsoft.com/responsible-ai policy submissions",
+                "on-the-issues",
+            ],
+            "public": [
+                "press interviews",
+                "podcast appearances",
+                "keynote transcripts (Microsoft Build, Davos)",
+                "microsoft.com/en-us/worklab/podcast",
+            ],
         },
     },
 
@@ -127,8 +142,10 @@ ACTORS = {
         "raw_subdir": "individuals/demis_hassabis",
         "sources": {
             "commercial": ["deepmind.google/blog"],
-            "policy": ["UK Parliament AI hearings", "AI Safety Summit transcripts"],
-            "public": ["Nature interviews", "Nobel Prize lecture", "podcasts"],
+            "policy": ["UK Parliament AI hearings", "AI Safety Summit transcripts",
+                       "aisi.gov.uk reports"],
+            "public": ["Nature interviews", "Nobel Prize lecture", "podcasts",
+                       "deepmind.google/research"],
         },
     },
 
@@ -183,7 +200,8 @@ ACTORS = {
         "contexts": {"commercial": 150, "policy": 90, "public": 80},
         "raw_subdir": "companies/meta_ai",
         "sources": {
-            "commercial": ["ai.meta.com/blog", "about.fb.com/news"],
+            "commercial": ["ai.meta.com/blog", "about.fb.com/news",
+                           "about.fb.com/tag/artificial-intelligence"],
             "policy": ["about.fb.com/policy", "regulatory submissions"],
             "public": ["press releases"],
         },
@@ -192,12 +210,12 @@ ACTORS = {
     "Microsoft": {
         "type": "company",
         "positioning": "capability",
-        "pair": None,
+        "pair": "Satya Nadella",
         "target": 320,
         "contexts": {"commercial": 140, "policy": 100, "public": 80},
         "raw_subdir": "companies/microsoft",
         "sources": {
-            "commercial": ["blogs.microsoft.com/ai", "azure.microsoft.com/blog"],
+            "commercial": ["blogs.microsoft.com/ai", "microsoft.com/en-us/research/blog"],
             "policy": ["microsoft.com/responsible-ai", "regulatory submissions"],
             "public": ["press releases", "research announcements"],
         },

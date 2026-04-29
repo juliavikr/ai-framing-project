@@ -30,9 +30,11 @@ ai-framing-project/
 │   │   │   ├── sam_altman/
 │   │   │   ├── dario_amodei/
 │   │   │   ├── jensen_huang/
-│   │   │   ├── elon_musk/
+│   │   │   ├── satya_nadella/
 │   │   │   ├── mark_zuckerberg/
 │   │   │   └── demis_hassabis/
+│   │   ├── _excluded/
+│   │   │   └── elon_musk/          ← removed from corpus; 21 docs archived
 │   │   ├── companies/
 │   │   │   ├── openai/
 │   │   │   ├── anthropic/
@@ -134,7 +136,7 @@ Ambiguity rule: if you debate a document's context for more than 30 seconds, dis
 | Sam Altman       | Sam Altman        | capability     | OpenAI          |
 | Dario Amodei     | Dario Amodei      | safety         | Anthropic       |
 | Jensen Huang     | Jensen Huang      | infrastructure | Nvidia          |
-| Elon Musk        | Elon Musk         | contrarian     | —               |
+| Satya Nadella    | Satya Nadella     | capability     | Microsoft       |
 | Mark Zuckerberg  | Mark Zuckerberg   | capability     | Meta AI         |
 | Demis Hassabis   | Demis Hassabis    | safety         | Google DeepMind |
 
@@ -145,7 +147,7 @@ Ambiguity rule: if you debate a document's context for more than 30 seconds, dis
 | Anthropic       | Anthropic       | safety         | Dario Amodei      |
 | Google DeepMind | Google DeepMind | capability     | Demis Hassabis    |
 | Meta AI         | Meta AI         | capability     | Mark Zuckerberg   |
-| Microsoft       | Microsoft       | capability     | —                 |
+| Microsoft       | Microsoft       | capability     | Satya Nadella     |
 | Nvidia          | Nvidia          | infrastructure | Jensen Huang      |
 
 ### Policymakers (4)
@@ -166,7 +168,7 @@ Ambiguity rule: if you debate a document's context for more than 30 seconds, dis
 | Sam Altman      | 130        | 120    | 130    | ~380   |
 | Dario Amodei    | 120        | 120    | 120    | ~360   |
 | Jensen Huang    | 150        | 60     | 120    | ~330   |
-| Elon Musk       | 100        | 50     | 150    | ~300   |
+| Satya Nadella   | 120        | 80     | 100    | ~300   |
 | Mark Zuckerberg | 120        | 60     | 150    | ~330   |
 | Demis Hassabis  | 100        | 80     | 120    | ~300   |
 
@@ -206,7 +208,7 @@ Balance rules — verify before running regression:
 | Sam Altman      | blog.samaltman.com                   | congress.gov testimony          | Lex Fridman, Dwarkesh podcasts  |
 | Dario Amodei    | darioamodei.com, anthropic.com/news  | senate.gov testimony            | CFR events, Dwarkesh, Lex       |
 | Jensen Huang    | blogs.nvidia.com, GTC keynote texts  | CSIS fireside, Senate Banking   | Stanford SIEPR, press           |
-| Elon Musk       | xAI blog, Tesla earnings calls       | sparse — use cautiously         | X posts (long-form), interviews |
+| Satya Nadella   | blogs.microsoft.com, LinkedIn        | Senate testimony, House cmte    | Press interviews, Build keynotes|
 | Mark Zuckerberg | ai.meta.com, earnings calls          | House Judiciary testimony       | Acquired podcast, press         |
 | Demis Hassabis  | deepmind.google/blog                 | UK parliament, AI Safety Summit | Nature interviews, podcasts     |
 
