@@ -1,0 +1,81 @@
+/Users/juliavikremoy/opt/anaconda3/lib/python3.9/site-packages/pandas/core/computation/expressions.py:21: UserWarning: Pandas requires version '2.8.4' or newer of 'numexpr' (version '2.8.3' currently installed).
+  from pandas.core.computation.check import NUMEXPR_INSTALLED
+/Users/juliavikremoy/opt/anaconda3/lib/python3.9/site-packages/pandas/core/arrays/masked.py:60: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+  from pandas.core import (
+/Users/juliavikremoy/Desktop/ai-framing-project/src/processing/build_corpus.py:17: DeprecationWarning: 
+Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
+(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
+but was not found to be installed on your system.
+If this would cause problems for you,
+please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
+        
+  import pandas as pd
+Raw docs loaded: 3545
+Enriched: 3545  |  Dropped: 0
+Deduped: removed 262 duplicate rows
+
+============================================================
+  BALANCE REPORT  —  3,283 documents
+============================================================
+
+[✗] Total docs: 3,283 / 6,000 (54.7%)
+
+[✗] Max single-actor share: UK DSIT 12.2% (limit 10%)
+
+  Actor breakdown:
+    UK DSIT                  399  (12.2%) ←
+    Dario Amodei             331  (10.1%) ←
+    EU Commission            311  (9.5%)
+    OpenAI                   305  (9.3%)
+    Microsoft                255  (7.8%)
+    Anthropic                234  (7.1%)
+    Satya Nadella            230  (7.0%)
+    Jensen Huang             167  (5.1%)
+    White House OSTP         159  (4.8%)
+    US Congress              158  (4.8%)
+    Google DeepMind          155  (4.7%)
+    Meta AI                  150  (4.6%)
+    Mark Zuckerberg          125  (3.8%)
+    Sam Altman               121  (3.7%)
+    Demis Hassabis           113  (3.4%)
+    Nvidia                    70  (2.1%)
+
+  Context breakdown:
+  [✓] commercial    1819  (55.4%, min 15%)
+  [✓] policy        1278  (38.9%, min 15%)
+  [✗] public         186  (5.7%, min 15%)
+
+  Actor-type split (targets: ind 35%, co 35%, pm 30%):
+  [✓] individual       1087  (33.1%, target 35%)
+  [✓] company          1169  (35.6%, target 35%)
+  [✓] policymaker      1027  (31.3%, target 30%)
+
+  Per-actor per-context coverage (min 50 each, policymakers exempt for commercial):
+  ✗  24 actor/context pairs below 50 docs:
+    Sam Altman / policy: 0
+    Sam Altman / public: 0
+    Dario Amodei / policy: 0
+    Dario Amodei / public: 0
+    Jensen Huang / policy: 0
+    Jensen Huang / public: 4
+    Satya Nadella / public: 42
+    Mark Zuckerberg / policy: 0
+    Mark Zuckerberg / public: 0
+    Demis Hassabis / policy: 2
+    Demis Hassabis / public: 11
+    OpenAI / public: 1
+    Anthropic / policy: 1
+    Anthropic / public: 0
+    Google DeepMind / policy: 0
+    Google DeepMind / public: 0
+    Meta AI / policy: 0
+    Meta AI / public: 0
+    Microsoft / public: 0
+    Nvidia / policy: 0
+    Nvidia / public: 0
+    EU Commission / public: 10
+    US Congress / public: 23
+    UK DSIT / public: 18
+
+============================================================
+

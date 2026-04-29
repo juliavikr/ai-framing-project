@@ -8,7 +8,7 @@ Submission deadline: ___________
 ---
 
 ## Current Status
-NOT STARTED
+IN PROGRESS — Week 1 data collection
 
 ---
 
@@ -18,39 +18,40 @@ Update counts after every scraping session.
 
 ### Individuals — target ~2,000
 
-| Actor           | Commercial  | Policy     | Public     | Total    | Status      |
-|-----------------|-------------|------------|------------|----------|-------------|
-| Sam Altman      | 0 / 130     | 0 / 120    | 0 / 130    | 0 / 380  | not started |
-| Dario Amodei    | 0 / 120     | 0 / 120    | 0 / 120    | 0 / 360  | not started |
-| Jensen Huang    | 0 / 150     | 0 / 60     | 0 / 120    | 0 / 330  | not started |
-| Elon Musk       | 0 / 100     | 0 / 50     | 0 / 150    | 0 / 300  | not started |
-| Mark Zuckerberg | 0 / 120     | 0 / 60     | 0 / 150    | 0 / 330  | not started |
-| Demis Hassabis  | 0 / 100     | 0 / 80     | 0 / 120    | 0 / 300  | not started |
-| **Subtotal**    |             |            |            | 0 / 2000 |             |
+| Actor           | Commercial  | Policy     | Public     | Total      | Status      |
+|-----------------|-------------|------------|------------|------------|-------------|
+| Sam Altman      | 121 / 130   | 0 / 120    | 0 / 130    | 121 / 380  | commercial done (blog exhausted at 121); policy/public: congress.gov+senate.gov 403; podcasts need transcript API — manual required |
+| Dario Amodei    | 331 / 120   | 0 / 120    | 0 / 120    | 331 / 360  | commercial done ✓ (sitemap: 331 docs); policy/public: sitemap has 1 policy URL (already scraped); all podcast/CFR sources need manual collection |
+| Jensen Huang    | 164 / 150   | 0 / 60     | 4 / 120    | 168 / 330  | commercial done ✓; policy: CSIS/Senate blocked + nvidia.com/gov JS-rendered; public: 4 from nvidianews — manual required for rest |
+| Elon Musk       | —           | —          | —          | excluded   | excluded — insufficient corpus (21 docs archived to data/raw/_excluded/elon_musk/) |
+| Satya Nadella   | 108 / 120   | 80 / 80    | 42 / 100   | 230 / 300  | all auto-scraped contexts done ✓ (author blog 108, on-the-issues 80, WorkLab 42); remaining public gap needs keynotes/press manually |
+| Mark Zuckerberg | 125 / 120   | 0 / 60     | 0 / 150    | 125 / 330  | commercial done ✓; policy/public: all testimony + podcast sources need manual — Acquired/Lex transcripts not scrapable |
+| Demis Hassabis  | 100 / 100   | 2 / 80     | 11 / 120   | 113 / 300  | commercial done ✓; policy: 2 from aisi.gov.uk, rest need UK Parliament manual; public: 11 from deepmind/research |
+| **Subtotal**    |             |            |            | 1088 / 2000 |            |
 
 ### Companies — target ~2,000
 
-| Actor           | Commercial  | Policy     | Public     | Total    | Status      |
-|-----------------|-------------|------------|------------|----------|-------------|
-| OpenAI          | 0 / 170     | 0 / 120    | 0 / 80     | 0 / 370  | not started |
-| Anthropic       | 0 / 150     | 0 / 120    | 0 / 80     | 0 / 350  | not started |
-| Google DeepMind | 0 / 150     | 0 / 100    | 0 / 80     | 0 / 330  | not started |
-| Meta AI         | 0 / 150     | 0 / 90     | 0 / 80     | 0 / 320  | not started |
-| Microsoft       | 0 / 140     | 0 / 100    | 0 / 80     | 0 / 320  | not started |
-| Nvidia          | 0 / 150     | 0 / 80     | 0 / 80     | 0 / 310  | not started |
-| **Subtotal**    |             |            |            | 0 / 2000 |             |
+| Actor           | Commercial  | Policy     | Public     | Total      | Status      |
+|-----------------|-------------|------------|------------|------------|-------------|
+| OpenAI          | 239 / 170   | 135 / 120  | 0 / 80     | 374 / 370  | commercial ✓ (239 via Wayback: blog/research/index patterns); policy ✓ (135 via index/*); public 0 — needs Wayback news/* pattern |
+| Anthropic       | 233 / 150   | 1 / 120    | 0 / 80     | 234 / 350  | commercial ✓ (233 via sitemap /news + /research); policy: 1 URL only — all policy/public needs manual or alternative source |
+| Google DeepMind | 155 / 150   | 0 / 100    | 0 / 80     | 155 / 330  | commercial ✓ (deepmind blog+research); policy/public: all sources are vague landing pages — needs specific URLs added manually |
+| Meta AI         | 150 / 150   | 0 / 90     | 0 / 80     | 150 / 320  | commercial ✓ (trimmed to 150 most recent); policy dir deleted (was mislabeled news); policy/public needs manual re-collect |
+| Microsoft       | 68 / 140    | 187 / 100  | 0 / 80     | 255 / 320  | policy ✓ (on-the-issues 187); commercial partial (68: blogs timeout before fetching); public sources too vague |
+| Nvidia          | 73 / 150    | 0 / 80     | 0 / 80     | 73 / 310   | commercial partial (73 from blogs.nvidia.com); policy: nvidia.gov JS-rendered 0 candidates; public: newsroom JS-rendered 0 candidates |
+| **Subtotal**    |             |            |            | ~1073      |             |
 
 ### Policymakers — target ~1,790 (no commercial context)
 
-| Actor            | Policy     | Public     | Total    | Status      |
-|------------------|------------|------------|----------|-------------|
-| EU Commission    | 0 / 380    | 0 / 100    | 0 / 480  | not started |
-| US Congress      | 0 / 380    | 0 / 70     | 0 / 450  | not started |
-| UK DSIT          | 0 / 350    | 0 / 80     | 0 / 430  | not started |
-| White House OSTP | 0 / 350    | 0 / 80     | 0 / 430  | not started |
-| **Subtotal**     |            |            | 0 / 1790 |             |
+| Actor            | Policy      | Public     | Total      | Status      |
+|------------------|-------------|------------|------------|-------------|
+| EU Commission    | 305 / 380   | 12 / 100   | 317 / 480  | policy 80% ✓; public 12% — presscorner JS-blocked, audiovisual is video; manual or Wayback needed |
+| US Congress      | 135 / 380   | 24 / 70    | 159 / 450  | policy 36% — all .senate.gov 403; only science.house.gov accessible; govinfo.gov JS-rendered; manual needed |
+| UK DSIT          | 390 / 350   | 18 / 80    | 408 / 430  | policy ✓✓ 111% (gov.uk API 3s-delay pass got 186 more, total 390); public 22% — structural cap (18 DSIT AI speeches on gov.uk) |
+| White House OSTP | 253 / 350   | 78 / 80    | 331 / 430  | policy 72% (Wayback CDX: 134 from ostp/* + 17 from ai/* = +151); public ✓ 98% |
+| **Subtotal**     |             |            | 1215 / 1790 |            |
 
-### TOTAL: 0 / 6,090
+### TOTAL: ~3,283 / 6,090 (54%) — after dedup (balance report: outputs/tables/final_balance_report.txt)
 
 ---
 
@@ -58,14 +59,21 @@ Update counts after every scraping session.
 
 Run `python src/processing/build_corpus.py --balance-report` after each major scraping phase.
 
-| Rule                              | Target      | Actual | Pass? |
-|-----------------------------------|-------------|--------|-------|
-| Total documents                   | >= 6,000    | —      | —     |
-| Largest single actor share        | <= 10%      | —      | —     |
-| Smallest context share            | >= 15%      | —      | —     |
-| Individuals share                 | ~35%        | —      | —     |
-| Companies share                   | ~35%        | —      | —     |
-| Policymakers share                | ~30%        | —      | —     |
+Last run: 2026-04-28  |  Full report: outputs/tables/final_balance_report.txt
+
+| Rule                              | Target      | Actual                          | Pass? |
+|-----------------------------------|-------------|---------------------------------|-------|
+| Total documents                   | >= 6,000    | 3,283 (54.7%)                   | ✗     |
+| Largest single actor share        | <= 10%      | UK DSIT 12.2%, Dario Amodei 10.1% | ✗  |
+| Smallest context share            | >= 15%      | public 5.7% (186 docs)          | ✗     |
+| Individuals share                 | ~35%        | 33.1% (1,087 docs)              | ✓     |
+| Companies share                   | ~35%        | 35.6% (1,169 docs)              | ✓     |
+| Policymakers share                | ~30%        | 31.3% (1,027 docs)              | ✓     |
+
+**Critical gaps (end of automated scraping):**
+- public context: 186 docs (5.7%) vs 15% minimum — needs ~750 more public docs across all actors
+- UK DSIT policy over-represented at 12.2% — may need to trim ~72 docs before regression
+- 24 actor/context pairs below 50-doc minimum (all are public or policy gaps)
 
 ---
 
