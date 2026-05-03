@@ -39,6 +39,12 @@ DELAY = 1.5
 MIN_TEXT_LEN = 300
 SOURCE_TIMEOUT = 240  # seconds per source block
 
+AI_SPEECH_KEYWORDS = [
+    "artificial intelligence", "machine learning", "large language model",
+    "neural network", "chatgpt", "generative ai", "ai act",
+    "ai regulation", "ai safety", "ai policy",
+]
+
 
 # ── File utilities ─────────────────────────────────────────────────────────────
 
@@ -558,6 +564,9 @@ _CONGRESS_PUBLIC_SOURCES: list[tuple[str, str]] = [
     ("https://www.commerce.senate.gov/press-releases", "speech"),
     ("https://www.judiciary.senate.gov/press-releases", "speech"),
     ("https://science.house.gov/press-releases", "speech"),
+    ("https://www.help.senate.gov/press-releases", "speech"),
+    ("https://intelligence.senate.gov/press-releases", "speech"),
+    ("https://www.banking.senate.gov/press-releases", "speech"),
 ]
 
 _CONGRESS_GOV_SEARCH = (
@@ -657,6 +666,20 @@ WAYBACK_CONFIG_POLICY: dict[str, list[tuple[str, str, str, str, str]]] = {
         ("whitehouse.gov/ostp/*", "20210120", "20250120", "policy", "regulatory_doc"),
         ("whitehouse.gov/ai/*",   "20210120", "20250120", "policy", "regulatory_doc"),
     ],
+    "EU Commission": [
+        # presscorner SPEECH_ items (2019-present, new URL scheme)
+        ("ec.europa.eu/commission/presscorner/detail/en/SPEECH_*",
+         "20190101", "", "public", "speech"),
+        # europa.eu/rapid legacy speech URLs (2015-2019)
+        ("europa.eu/rapid/press-release_SPEECH-*",
+         "20150101", "20200101", "public", "speech"),
+    ],
+}
+
+# Per-actor keyword allowlists: only save a Wayback doc if at least one keyword
+# appears in its full text (case-insensitive). Actors not listed here get no filter.
+WAYBACK_KEYWORD_FILTERS: dict[str, list[str]] = {
+    "EU Commission": AI_SPEECH_KEYWORDS,
 }
 
 
@@ -753,6 +776,9 @@ def run_wayback_policy(
                 continue
             text = extract_text(soup)
             if len(text) < MIN_TEXT_LEN:
+                continue
+            keywords = WAYBACK_KEYWORD_FILTERS.get(actor_name)
+            if keywords and not any(kw in text.lower() for kw in keywords):
                 continue
             doc = {
                 "url":      original_url,

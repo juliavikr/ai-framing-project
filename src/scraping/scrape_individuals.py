@@ -366,6 +366,169 @@ def scrape_source(
     return docs, skipped
 
 
+# ── Wayback Machine CDX ────────────────────────────────────────────────────────
+
+CDX_API = "http://web.archive.org/cdx/search/cdx"
+SOURCE_TIMEOUT = 240  # seconds per source block
+
+# actor_name → list of (url_pattern, from_ts, to_ts, context, platform)
+WAYBACK_CONFIG_INDIVIDUALS: dict[str, list[tuple[str, str, str, str, str]]] = {
+    "Sam Altman": [
+        ("judiciary.senate.gov/hearings/*",  "20220101", "", "policy", "testimony"),
+        ("commerce.senate.gov/hearings/*",   "20220101", "", "policy", "testimony"),
+    ],
+    "Dario Amodei": [
+        ("judiciary.senate.gov/hearings/*",  "20220101", "", "policy", "testimony"),
+        ("commerce.senate.gov/hearings/*",   "20220101", "", "policy", "testimony"),
+    ],
+    "Mark Zuckerberg": [
+        ("judiciary.senate.gov/hearings/*",  "20220101", "", "policy", "testimony"),
+        ("commerce.senate.gov/hearings/*",   "20220101", "", "policy", "testimony"),
+        ("judiciary.house.gov/hearings/*",   "20220101", "", "policy", "testimony"),
+    ],
+    "Jensen Huang": [
+        ("banking.senate.gov/hearings/*",    "20220101", "", "policy", "testimony"),
+        ("csis.org/events/*",               "20220101", "", "policy", "speech"),
+    ],
+    "Demis Hassabis": [
+        ("committees.parliament.uk/oralevidence/*", "20220101", "", "policy", "testimony"),
+        ("csis.org/events/*",                       "20220101", "", "policy", "speech"),
+    ],
+    "Satya Nadella": [
+        ("judiciary.senate.gov/hearings/*",  "20220101", "", "policy", "testimony"),
+        ("commerce.senate.gov/hearings/*",   "20220101", "", "policy", "testimony"),
+    ],
+}
+
+# Keyword allowlists: skip a Wayback doc if none of the actor's keywords appear in text.
+WAYBACK_KEYWORD_INDIVIDUALS: dict[str, list[str]] = {
+    "Sam Altman":      ["sam altman", "openai"],
+    "Dario Amodei":    ["dario amodei", "amodei", "anthropic"],
+    "Mark Zuckerberg": ["zuckerberg", "mark zuckerberg"],
+    "Jensen Huang":    ["jensen huang", "nvidia"],
+    "Demis Hassabis":  ["demis hassabis", "hassabis", "deepmind"],
+    "Satya Nadella":   ["satya nadella", "nadella", "microsoft"],
+}
+
+
+def cdx_query(
+    session: requests.Session,
+    url_pattern: str,
+    from_ts: str = "",
+    to_ts: str = "",
+    limit: int = 500,
+) -> list[tuple[str, str]]:
+    """Query Wayback CDX. Returns (original_url, timestamp) pairs, deduped by urlkey."""
+    params = [
+        ("url",      url_pattern),
+        ("output",   "json"),
+        ("fl",       "original,timestamp"),
+        ("filter",   "statuscode:200"),
+        ("collapse", "urlkey"),
+        ("limit",    str(limit)),
+    ]
+    if from_ts:
+        params.append(("from", from_ts))
+    if to_ts:
+        params.append(("to", to_ts))
+    try:
+        resp = session.get(CDX_API, params=params, timeout=30)
+        resp.raise_for_status()
+        rows = resp.json()
+    except Exception as exc:
+        print(f"  ! CDX query failed for {url_pattern}: {exc}")
+        return []
+    if not rows or rows[0] == ["original", "timestamp"]:
+        rows = rows[1:]
+    return [(r[0], r[1]) for r in rows if len(r) == 2]
+
+
+def fetch_wayback(
+    session: requests.Session, original_url: str, timestamp: str
+) -> Optional[BeautifulSoup]:
+    """Fetch a Wayback snapshot; returns BeautifulSoup or None."""
+    wb_url = f"https://web.archive.org/web/{timestamp}/{original_url}"
+    return fetch(session, wb_url)
+
+
+def parse_wayback_date(timestamp: str) -> str:
+    """Convert YYYYMMDDHHMMSS → YYYY-MM-DD."""
+    if len(timestamp) >= 8:
+        return f"{timestamp[:4]}-{timestamp[4:6]}-{timestamp[6:8]}"
+    return "unknown"
+
+
+def run_wayback_individuals(
+    session: requests.Session,
+    actor_name: str,
+    actor_cfg: dict,
+    limit: int,
+    context_filter: Optional[str],
+) -> dict[str, int]:
+    """Scrape an individual actor's blocked policy sources via Wayback CDX.
+    Returns {context: n_saved}."""
+    entries = WAYBACK_CONFIG_INDIVIDUALS.get(actor_name, [])
+    if not entries:
+        print(f"No Wayback config for '{actor_name}'")
+        return {}
+
+    if context_filter:
+        entries = [e for e in entries if e[3] == context_filter]
+
+    keywords = WAYBACK_KEYWORD_INDIVIDUALS.get(actor_name)
+    output_dir = DATA_RAW / actor_cfg["raw_subdir"]
+    output_dir.mkdir(parents=True, exist_ok=True)
+    seen_urls = load_seen_urls(output_dir)
+
+    totals: dict[str, int] = {}
+
+    for url_pattern, from_ts, to_ts, context, platform in entries:
+        print(f"\n── WAYBACK  {url_pattern}  {from_ts}–{to_ts}  ctx={context}  "
+              f"(seen: {len(seen_urls)}) ──")
+        captures = cdx_query(session, url_pattern, from_ts, to_ts, limit=limit * 3)
+        print(f"  CDX returned {len(captures)} captures")
+
+        saved = 0
+        skipped = 0
+        t0 = time.monotonic()
+
+        for original_url, timestamp in captures:
+            if saved >= limit:
+                break
+            if time.monotonic() - t0 > SOURCE_TIMEOUT:
+                print(f"  ! timeout ({SOURCE_TIMEOUT}s) — stopping")
+                break
+            if original_url in seen_urls:
+                skipped += 1
+                continue
+            time.sleep(DELAY)
+            soup = fetch_wayback(session, original_url, timestamp)
+            if soup is None:
+                continue
+            text = extract_text(soup)
+            if len(text) < MIN_TEXT_LEN:
+                continue
+            if keywords and not any(kw in text.lower() for kw in keywords):
+                continue
+            doc = {
+                "url":      original_url,
+                "date":     parse_wayback_date(timestamp),
+                "text":     text,
+                "actor":    actor_name,
+                "context":  context,
+                "platform": platform,
+            }
+            save_doc(doc, output_dir)
+            seen_urls.add(original_url)
+            saved += 1
+
+        total_on_disk = len(list(output_dir.glob("*.json")))
+        print(f"  saved {saved}  |  skipped {skipped}  |  total on disk {total_on_disk}")
+        totals[context] = totals.get(context, 0) + saved
+
+    return totals
+
+
 # ── CLI ────────────────────────────────────────────────────────────────────────
 
 def parse_args() -> argparse.Namespace:
@@ -379,14 +542,20 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--context",
-        required=True,
         choices=["commercial", "policy", "public"],
+        default=None,
+        help="Context to scrape (required in standard mode; optional filter with --wayback)",
     )
     p.add_argument(
         "--limit",
         type=int,
         default=400,
         help="Maximum total documents to collect (default: 400)",
+    )
+    p.add_argument(
+        "--wayback",
+        action="store_true",
+        help="Scrape via Wayback Machine CDX (for blocked policy sources)",
     )
     return p.parse_args()
 
@@ -404,6 +573,31 @@ def main() -> None:
     actor_cfg = ACTORS[args.actor]
     if actor_cfg["type"] != "individual":
         print(f"Error: '{args.actor}' is not an individual actor (type={actor_cfg['type']}).")
+        sys.exit(1)
+
+    session = make_session()
+
+    # ── Wayback mode ───────────────────────────────────────────────────────────
+    if args.wayback:
+        print(f"\n{'='*55}")
+        print(f"Actor:   {args.actor}  |  WAYBACK CDX  |  limit {args.limit}")
+        print(f"{'='*55}")
+        totals = run_wayback_individuals(session, args.actor, actor_cfg, args.limit, args.context)
+        grand_total = sum(totals.values())
+        print(f"\n{'─'*55}")
+        print(f"  {args.actor} — WAYBACK DONE")
+        print(f"{'─'*55}")
+        for ctx, n in totals.items():
+            target = actor_cfg["contexts"].get(ctx, 0)
+            pct = n / target * 100 if target else 0
+            print(f"  {ctx:<12} {n:>4} / {target:<4}  ({pct:.0f}%)")
+        print(f"  {'TOTAL':<12} {grand_total:>4}")
+        print(f"{'─'*55}\n")
+        return
+
+    # ── Standard mode ──────────────────────────────────────────────────────────
+    if args.context is None:
+        print("Error: --context is required in standard mode (omit only with --wayback)")
         sys.exit(1)
 
     sources: list[str] = actor_cfg["sources"].get(args.context, [])
@@ -424,7 +618,6 @@ def main() -> None:
     print(f"Pre-existing docs: {pre_existing}")
     print(f"{'='*55}\n")
 
-    session = make_session()
     total_saved = 0
     total_skipped = 0
 

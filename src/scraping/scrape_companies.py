@@ -514,6 +514,22 @@ WAYBACK_CONFIG: dict[str, list[tuple[str, str, str]]] = {
         ("openai.com/index/*",           "policy",     "regulatory_doc"),
         ("openai.com/news/*",            "public",     "press_release"),
     ],
+    "anthropic": [
+        ("anthropic.com/news/*",         "public",     "press_release"),
+    ],
+    "google_deepmind": [
+        ("deepmind.google/blog/*",       "public",     "blog"),
+    ],
+    "meta_ai": [
+        ("about.fb.com/news/*",          "public",     "press_release"),
+    ],
+    "microsoft": [
+        ("news.microsoft.com/*",         "public",     "press_release"),
+    ],
+    "nvidia": [
+        ("nvidianews.nvidia.com/news/*",     "public", "press_release"),
+        ("nvidianews.nvidia.com/releases/*", "public", "press_release"),
+    ],
 }
 
 
