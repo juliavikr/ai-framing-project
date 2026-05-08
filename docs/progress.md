@@ -8,50 +8,47 @@ Submission deadline: ___________
 ---
 
 ## Current Status
-IN PROGRESS — Week 1 data collection
+IN PROGRESS — Week 1 data collection COMPLETE (automated scraping done)
 
 ---
 
-## Corpus Tracker — target ~6,090 docs
-
-Update counts after every scraping session.
+## Corpus Tracker — target ~6,000 docs
 
 ### Individuals — target ~2,000
 
-| Actor           | Commercial  | Policy     | Public     | Total      | Status      |
-|-----------------|-------------|------------|------------|------------|-------------|
-| Sam Altman      | 121 / 130   | 0 / 120    | 0 / 130    | 121 / 380  | commercial done (blog exhausted at 121); policy/public: congress.gov+senate.gov 403; podcasts need transcript API — manual required |
-| Dario Amodei    | 331 / 120   | 0 / 120    | 0 / 120    | 331 / 360  | commercial done ✓ (sitemap: 331 docs); policy/public: sitemap has 1 policy URL (already scraped); all podcast/CFR sources need manual collection |
-| Jensen Huang    | 164 / 150   | 0 / 60     | 4 / 120    | 168 / 330  | commercial done ✓; policy: CSIS/Senate blocked + nvidia.com/gov JS-rendered; public: 4 from nvidianews — manual required for rest |
-| Elon Musk       | —           | —          | —          | excluded   | excluded — insufficient corpus (21 docs archived to data/raw/_excluded/elon_musk/) |
-| Satya Nadella   | 108 / 120   | 80 / 80    | 42 / 100   | 230 / 300  | all auto-scraped contexts done ✓ (author blog 108, on-the-issues 80, WorkLab 42); remaining public gap needs keynotes/press manually |
-| Mark Zuckerberg | 125 / 120   | 0 / 60     | 0 / 150    | 125 / 330  | commercial done ✓; policy/public: all testimony + podcast sources need manual — Acquired/Lex transcripts not scrapable |
-| Demis Hassabis  | 100 / 100   | 2 / 80     | 11 / 120   | 113 / 300  | commercial done ✓; policy: 2 from aisi.gov.uk, rest need UK Parliament manual; public: 11 from deepmind/research |
-| **Subtotal**    |             |            |            | 1088 / 2000 |            |
+| Actor           | Commercial  | Policy  | Public | Total       | Status      |
+|-----------------|-------------|---------|--------|-------------|-------------|
+| Sam Altman      | 121 / 130   | 0 / 120 | 1 / 130 | 122 / 380  | commercial done (blog exhausted); policy/public: congress.gov 403, podcasts YouTube-only — structural gap |
+| Dario Amodei    | 331 / 120   | 0 / 120 | 2 / 120 | 333 / 360  | commercial ✓ (331 via Anthropic sitemap + blog); policy/public: CFR/podcasts YouTube-only — structural gap |
+| Jensen Huang    | 164 / 150   | 0 / 60  | 9 / 120 | 172 / 330  | commercial done ✓; policy: CSIS/Senate 403, nvidia.gov JS-rendered; public: Lex Fridman + nvidianews |
+| Satya Nadella   | 108 / 120   | 80 / 80 | 47 / 100| 235 / 300  | ✓ commercial (author blog), ✓ policy (on-the-issues 80), public 47% (WorkLab) |
+| Mark Zuckerberg | 125 / 120   | 0 / 60  | 3 / 150 | 128 / 330  | commercial done ✓; policy/public: all testimony + podcast YouTube-only — structural gap |
+| Demis Hassabis  | 105 / 100   | 2 / 80  | 16 / 120| 123 / 300  | commercial done ✓; policy: 2 from aisi; public: Lex Fridman + Nobel PDF + DeepMind research |
+| **Subtotal**    |             |         |        | **1,113 / 2,000** |       |
 
 ### Companies — target ~2,000
 
-| Actor           | Commercial  | Policy     | Public     | Total      | Status      |
-|-----------------|-------------|------------|------------|------------|-------------|
-| OpenAI          | 239 / 170   | 135 / 120  | 0 / 80     | 374 / 370  | commercial ✓ (239 via Wayback: blog/research/index patterns); policy ✓ (135 via index/*); public 0 — needs Wayback news/* pattern |
-| Anthropic       | 233 / 150   | 1 / 120    | 0 / 80     | 234 / 350  | commercial ✓ (233 via sitemap /news + /research); policy: 1 URL only — all policy/public needs manual or alternative source |
-| Google DeepMind | 155 / 150   | 0 / 100    | 0 / 80     | 155 / 330  | commercial ✓ (deepmind blog+research); policy/public: all sources are vague landing pages — needs specific URLs added manually |
-| Meta AI         | 150 / 150   | 0 / 90     | 0 / 80     | 150 / 320  | commercial ✓ (trimmed to 150 most recent); policy dir deleted (was mislabeled news); policy/public needs manual re-collect |
-| Microsoft       | 68 / 140    | 187 / 100  | 0 / 80     | 255 / 320  | policy ✓ (on-the-issues 187); commercial partial (68: blogs timeout before fetching); public sources too vague |
-| Nvidia          | 73 / 150    | 0 / 80     | 0 / 80     | 73 / 310   | commercial partial (73 from blogs.nvidia.com); policy: nvidia.gov JS-rendered 0 candidates; public: newsroom JS-rendered 0 candidates |
-| **Subtotal**    |             |            |            | ~1073      |             |
+| Actor           | Commercial  | Policy  | Public  | Total       | Status      |
+|-----------------|-------------|---------|---------|-------------|-------------|
+| OpenAI          | ~545 / 170  | ~135/120| 0 / 80  | 545 / 370   | commercial/policy ✓ (Wayback + sitemap); public: openai.com 403 — structural gap |
+| Anthropic       | ~520 / 150  | 1 / 120 | 35 / 80 | 528 / 350   | commercial ✓ (arXiv + sitemap); policy 404; public from anthropic.com/news |
+| Google DeepMind | ~500 / 150  | 0 / 100 | 51 / 80 | 551 / 330   | commercial ✓ (arXiv + blog); policy: all sources vague; public from blog.google |
+| Meta AI         | ~533 / 150  | 0 / 90  | 0 / 80  | 533 / 320   | commercial ✓ (arXiv + ai.meta.com); policy/public: about.meta.com redirects — structural gap |
+| Microsoft       | ~520 / 140  | ~39/100 | 39 / 80 | 591 / 320   | commercial ✓ (arXiv + blogs); policy partial (on-the-issues); public from news.microsoft.com |
+| Nvidia          | ~354 / 150  | 0 / 80  | 6 / 80  | 360 / 310   | commercial ✓ (arXiv + blogs); policy: nvidia.gov 404; public: nvidianews 6 docs |
+| **Subtotal**    |             |         |         | **3,108 / 2,000** |      |
 
 ### Policymakers — target ~1,790 (no commercial context)
 
-| Actor            | Policy      | Public     | Total      | Status      |
-|------------------|-------------|------------|------------|-------------|
-| EU Commission    | 305 / 380   | 12 / 100   | 317 / 480  | policy 80% ✓; public 12% — presscorner JS-blocked, audiovisual is video; manual or Wayback needed |
-| US Congress      | 135 / 380   | 24 / 70    | 159 / 450  | policy 36% — all .senate.gov 403; only science.house.gov accessible; govinfo.gov JS-rendered; manual needed |
-| UK DSIT          | 390 / 350   | 18 / 80    | 408 / 430  | policy ✓✓ 111% (gov.uk API 3s-delay pass got 186 more, total 390); public 22% — structural cap (18 DSIT AI speeches on gov.uk) |
-| White House OSTP | 253 / 350   | 78 / 80    | 331 / 430  | policy 72% (Wayback CDX: 134 from ostp/* + 17 from ai/* = +151); public ✓ 98% |
-| **Subtotal**     |             |            | 1215 / 1790 |            |
+| Actor            | Policy      | Public   | Total       | Status      |
+|------------------|-------------|----------|-------------|-------------|
+| EU Commission    | ~395 / 380  | 10 / 100 | 405 / 480   | policy ✓ (europarl + commission + EUR-Lex); public: presscorner JS-blocked — structural gap |
+| US Congress      | ~246 / 380  | 23 / 70  | 269 / 450   | policy partial (all senate.gov 403; only science.house.gov); public partial |
+| UK DSIT          | ~450 / 350  | 19 / 80  | 469 / 430   | policy ✓ (gov.uk API + AISI); public structural cap (19 DSIT AI speeches — exhausted) |
+| White House OSTP | ~561 / 350  | 0 / 80   | 561 / 430   | policy ✓ (Biden archive + Biden OSTP + EOs); public deleted (non-AI speeches scraped in error) |
+| **Subtotal**     |             |          | **1,704 / 1,790** |        |
 
-### TOTAL: ~3,283 / 6,090 (54%) — after dedup (balance report: outputs/tables/final_balance_report.txt)
+### TOTAL: **5,925 / 6,000 (98.8%)**
 
 ---
 
@@ -59,21 +56,22 @@ Update counts after every scraping session.
 
 Run `python src/processing/build_corpus.py --balance-report` after each major scraping phase.
 
-Last run: 2026-04-28  |  Full report: outputs/tables/final_balance_report.txt
+Last run: 2026-04-28  |  corpus.csv written to data/processed/corpus.csv
 
-| Rule                              | Target      | Actual                          | Pass? |
-|-----------------------------------|-------------|---------------------------------|-------|
-| Total documents                   | >= 6,000    | 3,283 (54.7%)                   | ✗     |
-| Largest single actor share        | <= 10%      | UK DSIT 12.2%, Dario Amodei 10.1% | ✗  |
-| Smallest context share            | >= 15%      | public 5.7% (186 docs)          | ✗     |
-| Individuals share                 | ~35%        | 33.1% (1,087 docs)              | ✓     |
-| Companies share                   | ~35%        | 35.6% (1,169 docs)              | ✓     |
-| Policymakers share                | ~30%        | 31.3% (1,027 docs)              | ✓     |
+| Rule                              | Target      | Actual                    | Pass? |
+|-----------------------------------|-------------|---------------------------|-------|
+| Total documents                   | >= 6,000    | 5,925 (98.8%)             | ✗ (close) |
+| Largest single actor share        | <= 10%      | Microsoft 10.0%           | ✓ (at cap) |
+| Smallest context share            | >= 15%      | public 3.9% (233 docs)    | ✗     |
+| Individuals share                 | ~35%        | 18.8% (1,113 docs)        | ✗     |
+| Companies share                   | ~35%        | 52.5% (3,108 docs)        | ✗     |
+| Policymakers share                | ~30%        | 28.8% (1,704 docs)        | ✓     |
 
-**Critical gaps (end of automated scraping):**
-- public context: 186 docs (5.7%) vs 15% minimum — needs ~750 more public docs across all actors
-- UK DSIT policy over-represented at 12.2% — may need to trim ~72 docs before regression
-- 24 actor/context pairs below 50-doc minimum (all are public or policy gaps)
+**Structural limitations (end of automated scraping — 2026-04-28):**
+- public context 3.9% vs 15% target: YouTube transcripts disabled, interview sites JS-rendered or paywalled, congressional testimony 403, EU presscorner blocked
+- individual type 18.8% vs 35% target: caused by 1,300+ arXiv research papers inflating company count to 52.5%
+- 24 actor/context pairs below 50-doc minimum: mostly policy/public gaps (individual policy all 0 except Satya Nadella 80, Demis Hassabis 2)
+- These are inherent limits of automated scraping; manual collection or transcript API access needed for individual policy/public contexts
 
 ---
 

@@ -57,6 +57,8 @@ SOURCE_REGISTRY: dict[str, tuple[str, str]] = {
     "openai.com/blog":           ("https://openai.com/blog",            "blog"),
     "openai.com/news":           ("https://openai.com/news",            "press_release"),
     # ── Anthropic ──────────────────────────────────────────────────────────────
+    "anthropic.com/press":       ("https://www.anthropic.com/news",     "press_release"),
+    # ── Anthropic ──────────────────────────────────────────────────────────────
     "anthropic.com/research":    ("https://www.anthropic.com/research", "research_paper"),
     "anthropic.com/policy":      ("https://www.anthropic.com/policy",   "regulatory_doc"),
     "anthropic.com/news":        ("https://www.anthropic.com/news",     "press_release"),
@@ -79,6 +81,10 @@ SOURCE_REGISTRY: dict[str, tuple[str, str]] = {
     "nvidia.com/en-us/research":   ("https://www.nvidia.com/en-us/research",    "research_paper"),
     "nvidianews.nvidia.com":       ("https://nvidianews.nvidia.com",            "press_release"),
     "blogs.nvidia.com":            ("https://blogs.nvidia.com",                 "blog"),
+    # ── Company newsroom / public sources ─────────────────────────────────────
+    "blog.google/technology/ai":   ("https://blog.google/technology/ai",        "press_release"),
+    "about.meta.com/news":         ("https://about.meta.com/news",              "press_release"),
+    "news.microsoft.com":          ("https://news.microsoft.com",               "press_release"),
 }
 
 UNSUPPORTED: list[tuple[str, str]] = [

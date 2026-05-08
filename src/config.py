@@ -160,7 +160,7 @@ ACTORS = {
         "sources": {
             "commercial": ["openai.com/blog", "openai.com/research"],
             "policy": ["openai.com/government", "regulatory submissions"],
-            "public": ["openai.com/news", "press releases"],
+            "public": ["openai.com/news"],
         },
     },
 
@@ -174,7 +174,7 @@ ACTORS = {
         "sources": {
             "commercial": ["anthropic.com/news", "anthropic.com/research"],
             "policy": ["anthropic.com/policy", "regulatory submissions"],
-            "public": ["press releases"],
+            "public": ["anthropic.com/press"],
         },
     },
 
@@ -188,7 +188,7 @@ ACTORS = {
         "sources": {
             "commercial": ["deepmind.google/blog", "deepmind.google/research"],
             "policy": ["AI principles docs", "regulatory submissions"],
-            "public": ["research announcements", "press releases"],
+            "public": ["blog.google/technology/ai"],
         },
     },
 
@@ -203,7 +203,7 @@ ACTORS = {
             "commercial": ["ai.meta.com/blog", "about.fb.com/news",
                            "about.fb.com/tag/artificial-intelligence"],
             "policy": ["about.fb.com/policy", "regulatory submissions"],
-            "public": ["press releases"],
+            "public": ["about.meta.com/news"],
         },
     },
 
@@ -217,7 +217,7 @@ ACTORS = {
         "sources": {
             "commercial": ["blogs.microsoft.com/ai", "microsoft.com/en-us/research/blog"],
             "policy": ["microsoft.com/responsible-ai", "regulatory submissions"],
-            "public": ["press releases", "research announcements"],
+            "public": ["news.microsoft.com"],
         },
     },
 
@@ -231,7 +231,7 @@ ACTORS = {
         "sources": {
             "commercial": ["blogs.nvidia.com", "nvidia.com/en-us/research"],
             "policy": ["nvidia.com/en-us/government", "regulatory submissions"],
-            "public": ["press releases", "nvidia.com/en-us/newsroom"],
+            "public": ["nvidianews.nvidia.com"],
         },
     },
 

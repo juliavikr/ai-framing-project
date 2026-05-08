@@ -28,6 +28,8 @@ seaborn==0.13.2
 # API clients
 anthropic==0.21.3
 newsapi-python==0.2.7
+youtube-transcript-api==0.6.3
+pdfplumber==0.11.4
 
 # Notebook
 jupyter==1.0.0

@@ -511,12 +511,17 @@ _OSTP_POLICY_SOURCES: list[tuple[str, str]] = [
     ("https://www.whitehouse.gov/briefing-room/presidential-actions/", "regulatory_doc"),
     ("https://www.whitehouse.gov/briefing-room/statements-releases/", "regulatory_doc"),
     ("https://ai.gov/", "regulatory_doc"),
-    ("https://www.whitehouse.gov/ai/", "regulatory_doc"),
+    # Biden archive (active OSTP content removed from whitehouse.gov after Jan 2025)
+    ("https://bidenwhitehouse.archives.gov/ostp/", "regulatory_doc"),
+    ("https://bidenwhitehouse.archives.gov/briefing-room/presidential-actions/", "regulatory_doc"),
+    ("https://bidenwhitehouse.archives.gov/briefing-room/statements-releases/", "regulatory_doc"),
 ]
 
 _OSTP_PUBLIC_SOURCES: list[tuple[str, str]] = [
     ("https://www.whitehouse.gov/briefing-room/speeches-remarks/", "speech"),
     ("https://www.whitehouse.gov/briefing-room/press-briefings/", "speech"),
+    ("https://bidenwhitehouse.archives.gov/briefing-room/speeches-remarks/", "speech"),
+    ("https://bidenwhitehouse.archives.gov/briefing-room/press-briefings/", "speech"),
 ]
 
 
