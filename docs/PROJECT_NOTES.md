@@ -176,13 +176,30 @@
   * Off-topic patterns: 106 removed (0.1%)
 - Clean pool saved to `data/annotation/clean_sentences.csv`
 
-### Kappa Round 3 — IN PROGRESS
+### Kappa Round 3 — κ = 0.86, PASS ✓  (2026-05-09)
 - Overlap set v3 redrawn from clean_sentences.csv
 - Stratification: 34 commercial / 33 policy / 33 public
 - 15 actors represented, 16% likely-None sentences, 70/30 post/pre-ChatGPT split
-- Both annotators re-annotating v3 sheets independently
-- Run: `python src/annotation/compute_kappa.py --a kappa_overlap_person_a_v3.xlsx
-  --b kappa_overlap_person_b_v3.xlsx --output kappa_results_v3.csv`
+- Both annotators completed v3 sheets independently
+
+| Label | Kappa | Agreement |
+|-------|-------|-----------|
+| Innovation/Progress | 0.86 | 95% |
+| Economic Benefit | 0.93 | 98% |
+| Risk/Harm | 0.80 | 96% |
+| Regulation/Governance | 0.83 | 95% |
+| Existential/AGI | 0.88 | 99% |
+| None | 0.85 | 93% |
+| **OVERALL** | **0.86** | **96%** |
+
+- 14 residual disagreements — all genuine edge cases (model cards as
+  Regulation/Governance vs. None; AI-speeds-up-AI as Innovation vs. Existential/AGI;
+  implicit risk statements vs. None). No garbage sentences in disagreement list.
+- Results saved to `outputs/tables/kappa_results_v3.csv`
+- **Interpretation:** jump from κ=0.37 to κ=0.86 in one step confirms the first two
+  rounds were suppressed entirely by corpus noise, not annotation disagreement.
+  Guidelines and calibration examples were effective once the noise was removed.
+- **Next step:** proceed to full LLM labeling (`label_with_llm.py`)
 
 ---
 
@@ -207,7 +224,7 @@
 - [ ] arXiv inflates company share to 52.5% — note in methodology
 - [ ] 24 actor/context pairs below 50-doc minimum — regression will filter to
       pairs with sufficient n; report which pairs are excluded
-- [ ] Kappa Round 3 result pending — need κ ≥ 0.70 before LLM labeling
-- [ ] LLM labeling pipeline (`label_with_llm.py`) not yet run
-- [ ] `validate_llm_labels.py` not yet run
-- [ ] Regression models not yet run
+- [x] Kappa threshold — κ = 0.86 PASSED (2026-05-09)
+- [ ] LLM labeling pipeline (`label_with_llm.py`) — NEXT
+- [ ] `validate_llm_labels.py` — pending LLM labeling
+- [ ] Regression models — pending LLM labeling

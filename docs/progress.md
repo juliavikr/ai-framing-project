@@ -88,17 +88,19 @@ Last run: 2026-05-08  |  corpus.csv written to data/processed/corpus.csv  |  5,9
 
 ## Annotation Milestones
 
-| Milestone                               | Target    | Actual  | Date |
-|-----------------------------------------|-----------|---------|------|
-| Guidelines v1.0 agreed (both sign off)  | Day 8     | —       | —    |
-| Gold set: Person A (300 sentences)      | 300       | —       | —    |
-| Gold set: Person B (300 sentences)      | 300       | —       | —    |
-| Cohen's Kappa computed                  | >= 0.70   | κ = —   | —    |
-| Kappa threshold passed                  | YES       | —       | —    |
-| Guidelines revised (if needed)          | —         | —       | —    |
-| LLM pipeline test (50 sentences)        | >= 80%    | —       | —    |
-| Full LLM labeling complete              | ~6,000    | —       | —    |
-| LLM validation accuracy (held-out 100)  | >= 80%    | —       | —    |
+| Milestone                               | Target    | Actual       | Date       |
+|-----------------------------------------|-----------|--------------|------------|
+| Guidelines v1.0 agreed (both sign off)  | Day 8     | ✓            | 2026-05-09 |
+| Gold set: Person A (300 sentences)      | 300       | 300 ✓        | 2026-05-09 |
+| Gold set: Person B (300 sentences)      | 300       | 300 ✓        | 2026-05-09 |
+| Kappa Round 1                           | >= 0.70   | κ = 0.36 ✗   | 2026-05-09 |
+| Kappa Round 2 (after guideline fix)     | >= 0.70   | κ = 0.37 ✗   | 2026-05-09 |
+| Corpus cleaning (clean_corpus.py)       | —         | 63,546 sents | 2026-05-09 |
+| Kappa Round 3 (clean pool, v3 sheets)   | >= 0.70   | κ = 0.86 ✓   | 2026-05-09 |
+| Kappa threshold passed                  | YES       | YES ✓        | 2026-05-09 |
+| LLM pipeline test (50 sentences)        | >= 80%    | —            | —          |
+| Full LLM labeling complete              | ~6,000    | —            | —          |
+| LLM validation accuracy (held-out 100)  | >= 80%    | —            | —          |
 
 ---
 
@@ -135,7 +137,7 @@ Last run: 2026-05-08  |  corpus.csv written to data/processed/corpus.csv  |  5,9
 | Sam Altman       | —      | —            | —            |
 | Dario Amodei     | —      | —            | —            |
 | Jensen Huang     | —      | —            | —            |
-| Elon Musk        | —      | —            | —            |
+| Satya Nadella    | —      | —            | —            |
 | Mark Zuckerberg  | —      | —            | —            |
 | Demis Hassabis   | —      | —            | —            |
 | OpenAI           | —      | —            | —            |
@@ -168,7 +170,7 @@ Person A — individuals + scraping pipeline:
   - [x] Demis Hassabis — commercial ✓ (105); policy 3 (AISI + PDF); public 16
 
 Person B — companies + policymakers + data pipeline:
-  - [ ] Snowflake: AI_FRAMING.PUBLIC.CORPUS table created  ← TODO
+  - [x] Snowflake: AI_FRAMING.PUBLIC.CORPUS table created ✓
   - [x] clean_and_dedupe.py tested on first batch
   - [x] build_corpus.py schema validation working (5,946 rows written)
   - [x] OpenAI — 546 docs (commercial Wayback + arXiv; policy Wayback + PDF)
@@ -184,17 +186,23 @@ Person B — companies + policymakers + data pipeline:
 
 Both — end of week:
   - [x] Balance report run — Microsoft at 10.0% cap ✓; public 4.0% (structural limitation)
-  - [ ] corpus.csv loaded to Snowflake  ← TODO
+  - [x] corpus.csv loaded to Snowflake ✓ (5,925 rows, 8.8s)
   - [x] No actor exceeds 10% of corpus ✓ (Microsoft at exactly 10.0%)
 
-### Week 2 — Annotation (Days 8–14)
+### Week 2 — Annotation (Days 8–14) — KAPPA PASSED, LLM LABELING NEXT
 
-  - [ ] Read annotation_guidelines.md together — both sign off verbally
-  - [ ] Agree gold set stratification: 100 sent/context, 4+ actors per context
-  - [ ] Person A: annotate 300 sentences → gold_set_person_a.csv
-  - [ ] Person B: annotate 300 sentences → gold_set_person_b.csv (independently)
-  - [ ] compute_kappa.py → κ = ___
-  - [ ] κ >= 0.70? If NO: identify disagreements, revise guidelines, re-annotate
+  - [x] Read annotation_guidelines.md together — both sign off verbally
+  - [x] Agree gold set stratification: 100 sent/context, 5+ actors per context
+  - [x] Person A: annotate 300 sentences → gold_set_person_a.csv
+  - [x] Person B: annotate 300 sentences → gold_set_person_b.csv (independently)
+  - [x] Kappa Round 1 → κ = 0.36 FAIL (28 disagreements, None/frame boundary)
+  - [x] Guidelines revised — added "None Boundary" rules + 10 calibration examples
+  - [x] Kappa Round 2 → κ = 0.37 FAIL (28 disagreements — corpus noise, not labels)
+  - [x] Corpus cleaned — clean_corpus.py (208,320 → 63,546 sentences, 5 filters)
+  - [x] Kappa Round 3 (clean pool, v3 sheets) → κ = 0.86 PASS ✓  (2026-05-09)
+        Innovation/Progress 0.86 | Economic Benefit 0.93 | Risk/Harm 0.80
+        Regulation/Governance 0.83 | Existential/AGI 0.88 | None 0.85
+        14 residual disagreements (all genuine edge cases) → saved kappa_results_v3.csv
   - [ ] LLM pipeline: test on 50 sentences, accuracy = ___%
   - [ ] Full LLM labeling run on all ~6,000 docs
   - [ ] validate_llm_labels.py on held-out 100 → accuracy = ___%
