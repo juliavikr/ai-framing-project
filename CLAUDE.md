@@ -7,6 +7,22 @@ To what extent do actors adapt their framing of AI across contexts
 
 **Team:** 2 people | **Timeline:** 4 weeks | **Target documents: ~6,000
 
+## Current Status — Week 2: Annotation Round 3 in progress
+
+| Milestone | State |
+|-----------|-------|
+| Data collection | COMPLETE — 5,925 docs, 16 actors |
+| PDF ingestion (21 docs) | COMPLETE — ingest_pdf.py |
+| Corpus loaded to Snowflake | COMPLETE — AI_FRAMING.PUBLIC.CORPUS |
+| Sentence pool cleaned | COMPLETE — 63,546 sentences (clean_sentences.csv) |
+| Gold set drawn | COMPLETE — prepare_gold_set.py |
+| Kappa Round 1 (κ = 0.36) | FAIL — None/frame boundary added to guidelines |
+| Kappa Round 2 (κ = 0.37) | FAIL — root cause: corpus noise, not guidelines |
+| Corpus cleaning | COMPLETE — clean_corpus.py (5 filters, 69.5% removed) |
+| Kappa Round 3 | IN PROGRESS — v3 sheets ready |
+| LLM labeling | PENDING — awaiting κ ≥ 0.70 |
+| Regression | PENDING |
+
 ---
 
 ## Hypotheses
@@ -20,6 +36,7 @@ To what extent do actors adapt their framing of AI across contexts
 ```
 ai-framing-project/
 ├── CLAUDE.md                        ← read this first, every session
+├── README.md
 ├── .env                             ← API keys (never commit)
 ├── .gitignore
 ├── requirements.txt
@@ -50,9 +67,12 @@ ai-framing-project/
 │   ├── processed/
 │   │   └── corpus.csv               ← master dataset, one row per document
 │   └── annotation/
+│       ├── clean_sentences.csv      ← 63,546 filtered sentences (clean_corpus.py)
 │       ├── gold_set_person_a.csv
 │       ├── gold_set_person_b.csv
 │       ├── gold_set_merged.csv
+│       ├── kappa_overlap_person_a_v3.xlsx  ← Round 3 overlap (clean pool)
+│       ├── kappa_overlap_person_b_v3.xlsx
 │       └── labeled_full.csv
 │
 ├── src/
@@ -61,11 +81,15 @@ ai-framing-project/
 │   │   ├── scrape_individuals.py
 │   │   ├── scrape_companies.py
 │   │   ├── scrape_policy.py
+│   │   ├── scrape_transcripts.py
+│   │   ├── ingest_pdf.py
 │   │   └── scrape_newsapi.py
 │   ├── processing/
 │   │   ├── clean_and_dedupe.py
-│   │   └── build_corpus.py
+│   │   ├── build_corpus.py
+│   │   └── clean_corpus.py          ← sentence-level quality filters + v3 redraw
 │   ├── annotation/
+│   │   ├── prepare_gold_set.py
 │   │   ├── label_with_llm.py
 │   │   ├── compute_kappa.py
 │   │   └── validate_llm_labels.py
@@ -89,7 +113,9 @@ ai-framing-project/
 │
 └── docs/
     ├── annotation_guidelines.md
-    └── progress.md
+    ├── progress.md
+    ├── PROJECT_NOTES.md             ← chronological decision log
+    └── sources.md                   ← per-actor source documentation
 ```
 
 ---
@@ -139,6 +165,12 @@ Ambiguity rule: if you debate a document's context for more than 30 seconds, dis
 | Satya Nadella    | Satya Nadella     | capability     | Microsoft       |
 | Mark Zuckerberg  | Mark Zuckerberg   | capability     | Meta AI         |
 | Demis Hassabis   | Demis Hassabis    | safety         | Google DeepMind |
+
+**Excluded:** Elon Musk — only 21 docs collected from accessible sources
+(Tesla EDGAR earnings, Rev.com transcripts); xAI blocked by Cloudflare;
+no accessible policy corpus. Raw files archived at data/raw/_excluded/elon_musk/.
+**Replaced by:** Satya Nadella — full commercial/policy/public coverage,
+clean individual↔company pair with Microsoft.
 
 ### Companies (6)
 | Actor           | CSV value       | positioning    | Paired individual |
@@ -197,6 +229,40 @@ Balance rules — verify before running regression:
 - No single context < 15% of corpus
 - Every actor has >= 50 docs in at least 2 contexts (policymakers exempt from commercial)
 - Type split roughly 35% individual / 35% company / 30% policymaker
+
+---
+
+## Actual Corpus State (as of Week 2)
+
+**Documents:** 5,925 (98.8% of target) — loaded to Snowflake and corpus.csv
+
+| Actor type  | Docs  | Share | Target | Status |
+|-------------|-------|-------|--------|--------|
+| Individuals | 1,122 | 18.9% | 35%    | ✗ below target — arXiv inflates company share |
+| Companies   | 3,111 | 52.5% | 35%    | ✗ above — ~1,300 arXiv papers counted as commercial |
+| Policymakers| 1,692 | 28.5% | 30%    | ✓ |
+
+| Context    | Docs  | Share | Target | Status |
+|------------|-------|-------|--------|--------|
+| Commercial | 3,661 | 61.8% | —      | — |
+| Policy     | 2,027 | 34.2% | —      | — |
+| Public     | 237   |  4.0% | ≥15%   | ✗ structural ceiling (YouTube/paywall) |
+
+**Known limitations** (document in paper methodology section):
+- arXiv papers inflate company commercial share — classified correctly per spec
+- Public context at 4.0% — YouTube captions disabled for all 14 target videos;
+  podcast sites JS-rendered; interview transcripts paywalled
+- Elon Musk excluded: 21 docs only (Tesla EDGAR + Rev.com transcripts);
+  replaced by Satya Nadella — full 3-context coverage, clean pair with Microsoft
+
+**Clean sentence pool** (data/annotation/clean_sentences.csv):
+- 208,320 raw sentences → 63,546 after filtering (30.5% retained)
+- Filters applied by clean_corpus.py:
+  1. Non-English (langdetect, confidence > 0.9): 712 removed
+  2. Too short (< 8 words): 20,723 removed
+  3. JSON/HTML fragments: 9,184 removed
+  4. No AI keyword relevance: 114,049 removed
+  5. Off-topic patterns (FEMA, trade stats, header fragments): 106 removed
 
 ---
 
