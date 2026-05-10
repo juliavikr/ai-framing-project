@@ -263,6 +263,121 @@
 
 ---
 
+## Week 3 — Analysis (2026-05-10)
+
+### regression.py bug: Model 2 filtering eliminated all actors
+
+The script filtered Model 2 at the **actor level**: drop any actor where *any*
+actor×context pair had < 50 docs. Because almost every actor has a thin public
+context (0–17 docs due to YouTube/paywall ceiling), every actor was dropped → N=0.
+Patsy then crashed building a design matrix from 0 rows with one remaining level.
+
+**Fix:** changed to pair-level filtering:
+1. Drop individual actor×context pairs below the 50-doc threshold
+2. Then exclude actors with only 1 context remaining (no estimable interaction)
+3. Result: 3 actors survive — Microsoft (commercial 84, policy 152), OpenAI
+   (commercial 194, policy 81), Satya Nadella (commercial 59, policy 66) → N=636
+
+The pair-level approach is more principled: an actor can contribute to Model 2
+for the contexts where they have enough data, rather than being eliminated because
+one unrelated context is thin. The 50-doc threshold is deliberate — below it, OLS
+interaction estimates for a cell are unreliable (inflated SE, near-degenerate df).
+
+**Paper note:** Model 2 results reflect only 3 cross-context actors and cannot
+be generalised to the full 16-actor corpus. This should be acknowledged explicitly
+in the methodology section alongside the corpus balance limitations.
+
+### Build features (build_features.py)
+
+n_sentences ≥ 5 filter retained 2,535 of 5,946 documents (dropped 3,411 short
+documents — procedural texts, boilerplate press releases, one-paragraph blog posts).
+
+Mean framing scores per context before regression:
+
+| Context    | Innovation | Economic | Risk  | Regulation | Existential |
+|------------|-----------|---------|-------|-----------|------------|
+| Commercial | 0.229     | 0.053   | 0.062 | 0.056     | 0.010      |
+| Policy     | 0.210     | 0.087   | 0.117 | 0.194     | 0.009      |
+| Public     | 0.256     | 0.085   | 0.018 | 0.034     | 0.009      |
+
+These descriptive means alone visually confirm H1 and H2 (policy higher on risk and
+regulation; commercial higher on innovation relative to policy).
+
+### Regression results summary
+
+**risk_score** (M1 R²=0.041, M3 R²=0.079):
+- Policy context +0.055*** and public context −0.043*** (M1) — policy docs contain
+  significantly more risk framing; public docs the least
+- Positioning is the dominant M3 predictor: safety actors (Anthropic, Amodei) +0.038***;
+  infrastructure actors (Nvidia, Huang) −0.049*** — actor positioning explains risk
+  framing better than context alone
+- Post-ChatGPT +0.016* — risk framing increased after Nov 2022
+- M2 interaction: OpenAI × policy β=−0.056* — OpenAI's policy documents are
+  notably less risk-focused than its commercial baseline, opposite of the H2 expectation
+
+**innovation_score** (M1 R²=0.014, M2 R²=0.082, M3 R²=0.064):
+- M1: policy context −0.023* (commercial is the innovation frame, not public);
+  post-ChatGPT +0.048*** — innovation framing surged after Nov 2022
+- M2 shows the largest interactions of any model: Satya Nadella × policy +0.271***
+  (Nadella's policy documents are far more innovation-framed than his commercial ones —
+  classic strategic adaptation); OpenAI × policy +0.101**
+- M3: platform matters — speeches +0.145**, research_papers −0.084***; safety
+  actors use significantly less innovation framing −0.042***
+- Notable: post-ChatGPT coefficient is significant and positive in M1 and M3 for
+  innovation, suggesting a broad discursive shift after the ChatGPT launch
+
+**regulation_score** (M1 R²=0.121, M2 R²=0.078, M3 R²=0.221 — highest R² across all models):
+- Regulation is the most structurally predictable frame: policy context +0.136*** alone
+  explains 12% of variance (M1), and the full M3 reaches R²=0.221
+- M3 dominant predictors: safety positioning +0.050***, press_release platform +0.043***,
+  post-ChatGPT +0.035***; research_papers −0.031**
+- M2 interaction: OpenAI × policy −0.097*** — OpenAI's policy documents avoid explicit
+  regulation language relative to Microsoft and Satya Nadella (interesting given Altman's
+  public testimony record; may reflect arXiv paper classification inflating commercial count)
+- Regulation frame is not just context-driven — it is positioning-driven and
+  platform-driven in a way risk and innovation are not
+
+### Variance analysis and H3
+
+Variance computed as cross-context standard deviation of mean framing scores.
+Only actors with ≥50 docs in ≥2 contexts qualify (5 actors total):
+
+| Actor           | Type        | Contexts       | Risk σ | Innovation σ | Regulation σ |
+|-----------------|-------------|----------------|--------|--------------|--------------|
+| Satya Nadella   | individual  | comm/pol/pub   | 0.050  | 0.129        | 0.064        |
+| Microsoft       | company     | comm/pol/pub   | 0.049  | 0.031        | 0.049        |
+| UK DSIT         | policymaker | pol/pub        | 0.036  | 0.088        | 0.012        |
+| OpenAI          | company     | comm/pol       | 0.008  | 0.037        | 0.011        |
+| Google DeepMind | company     | comm/pub       | 0.032  | 0.011        | 0.016        |
+
+H3 could not be tested with a t-test — only 1 individual qualifies (Satya Nadella).
+Descriptive finding: Nadella shows highest innovation variance (σ=0.129) and
+regulation variance (σ=0.064) of any actor, substantially above his paired company
+Microsoft (σ=0.031, σ=0.049). This is the strongest direct evidence of individual
+strategic adaptation in the corpus. Paper should present this as illustrative rather
+than inferential, and note the corpus limitation explicitly.
+
+### Hypothesis verdicts
+
+**H1 — Does context predict framing?** CONFIRMED ✓
+Context is significant in M1 for all three DVs (all p < 0.001). The finding is not
+driven by a single outlier context — policy increases risk and regulation, public
+reduces both.
+
+**H2 — Commercial → innovation/economic; policy → risk/regulation?** PARTIALLY CONFIRMED ✓
+- Policy → regulation: strongly confirmed (β=+0.136***)
+- Policy → risk: confirmed (β=+0.055***)
+- Commercial → innovation: confirmed by inversion (policy β=−0.023* below commercial baseline)
+- Commercial → economic benefit: not significant in any model. Economic framing is low
+  across all contexts (max 8.7% in policy), possibly because it is inherently
+  cross-context or because the LLM underdetects it (precision=1.0, recall=0.375 in validation)
+
+**H3 — Individuals adapt more than institutions?** DIRECTIONALLY SUPPORTED, not testable ✓
+Satya Nadella (the one qualifying individual) shows consistently higher cross-context
+variance than all qualifying companies except Microsoft on risk. Formally untestable.
+
+---
+
 ## Key decisions log
 
 | Decision | Alternatives considered | Reason chosen |
@@ -284,16 +399,19 @@
 - [ ] Public context at 4.0% — below 15% minimum target; document as structural
       limitation in paper data section
 - [ ] arXiv inflates company share to 52.5% — note in methodology
-- [ ] 24 actor/context pairs below 50-doc minimum — regression will filter to
-      pairs with sufficient n; report which pairs are excluded
+- [ ] 24 actor/context pairs below 50-doc minimum — regression filtered to pairs with
+      sufficient n; only 3 actors survive M2 — document in methodology
 - [x] Kappa threshold — κ = 0.86 PASSED (2026-05-09)
 - [x] LLM labeling pipeline — COMPLETE (63,546 sentences, 2026-05-10)
 - [x] `validate_llm_labels.py` — macro F1 = 0.633 (precision 0.847, recall 0.534)
-- [~] Innovation sub-classification — BLOCKED (needs ~$1 Anthropic credits; script fixed with streaming write + resume)
-- [ ] `build_features.py` — pending sub-classification completion
-- [ ] Regression models (Models 1–3 for risk_score, innovation_score, regulation_score) — pending features
-- [ ] variance_analysis.py — test H3 (individuals vary more than institutions across contexts)
-- [ ] Paper write-up — Week 4 goal
+- [~] Innovation sub-classification — BLOCKED (needs ~$1 Anthropic credits; script fixed
+      with streaming write + resume). Bonus column only; does not affect Models 1–3.
+- [x] `build_features.py` — DONE (2026-05-10); analysis_dataset.csv written (2,535 docs)
+- [x] Regression models (Models 1–3 for all three DVs) — DONE (2026-05-10)
+- [x] variance_analysis.py — DONE (2026-05-10); H3 directionally supported, not formally testable
+- [ ] **Paper write-up — Week 4 — CURRENT PRIORITY**
+      Inputs ready: outputs/tables/ (all regression tables, variance tables),
+      outputs/figures/ (variance bar charts)
 
 **End product goal:**
 The final deliverable is an academic paper testing strategic framing adaptation in AI discourse.

@@ -100,15 +100,25 @@ def main():
     save_results(m1, "m1", dv)
 
     # ── Model 2: Strategic adaptation ─────────────────────────────────────────
-    # Filter to pairs with sufficient docs for reliable interaction estimates
-    pair_n = df.groupby(["actor", "context"]).size().reset_index(name="n")
-    thin_actors = set(
-        pair_n[pair_n["n"] < args.min_pair_docs]["actor"].unique()
-    )
-    df2 = df[~df["actor"].isin(thin_actors)].copy()
-    if thin_actors:
-        print(f"\n  Model 2: dropping actors with any pair < {args.min_pair_docs} docs: "
-              f"{sorted(thin_actors)}")
+    # Keep only actor×context pairs with enough docs for reliable estimates,
+    # then restrict to actors that still appear in >= 2 contexts so that
+    # interaction terms are estimable.
+    pair_n = df.groupby(["actor", "context"], observed=True).size().reset_index(name="n")
+    sufficient = pair_n[pair_n["n"] >= args.min_pair_docs][["actor", "context"]]
+    df2 = df.merge(sufficient, on=["actor", "context"], how="inner").copy()
+
+    ctx_per_actor = df2.groupby("actor", observed=True)["context"].nunique()
+    single_ctx = sorted(ctx_per_actor[ctx_per_actor < 2].index)
+    df2 = df2[~df2["actor"].isin(single_ctx)].copy()
+
+    dropped_pairs = pair_n[pair_n["n"] < args.min_pair_docs][["actor", "context", "n"]]
+    if not dropped_pairs.empty:
+        print(f"\n  Model 2: excluded thin pairs (< {args.min_pair_docs} docs):")
+        for _, r in dropped_pairs.iterrows():
+            print(f"    {r['actor']} × {r['context']}: {int(r['n'])} docs")
+    if single_ctx:
+        print(f"  Model 2: also excluded (only 1 context remaining): {single_ctx}")
+    print(f"  Model 2 actors: {sorted(df2['actor'].unique())}")
     print(f"  Model 2 N = {len(df2):,}")
 
     formula2 = f"{dv} ~ C(actor) + C(context) + C(actor):C(context)"
