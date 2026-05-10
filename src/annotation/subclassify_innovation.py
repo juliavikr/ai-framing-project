@@ -273,9 +273,9 @@ def main():
     print(f"\nDone — {n_written:,} new sentences in {elapsed_total:.0f}s")
 
     # ── Cost estimate ─────────────────────────────────────────────────────────
-    est_input  = batch_num * 400
-    est_output = batch_num * 100
-    cost = est_input / 1e6 * 0.80 + est_output / 1e6 * 4.00
+    est_input  = batch_num * 400   # ~400 input tokens/batch (system + sentence texts)
+    est_output = batch_num * 100   # ~100 output tokens/batch (compact JSON)
+    cost = est_input / 1e6 * 1.00 + est_output / 1e6 * 5.00  # Haiku 4.5 pricing
     print(f"Estimated API cost this run: ${cost:.2f}  ({batch_num} batches)")
 
     if FAILED_LOG.exists():
