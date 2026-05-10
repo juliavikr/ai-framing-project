@@ -195,6 +195,8 @@ def parse_args():
                    help="Path to Person A's annotation sheet")
     p.add_argument("--b", default=str(DATA_ANNOTATION / "annotation_sheet_person_b.xlsx"),
                    help="Path to Person B's annotation sheet")
+    p.add_argument("--output", default=None,
+                   help="Output CSV filename (default: kappa_results.csv)")
     return p.parse_args()
 
 
@@ -202,6 +204,7 @@ def main():
     args = parse_args()
     path_a = Path(args.a)
     path_b = Path(args.b)
+    # make args available to the save block below via closure
 
     for p in (path_a, path_b):
         if not p.exists():
@@ -259,7 +262,7 @@ def main():
 
     # Save CSV
     OUTPUTS_TABLES.mkdir(parents=True, exist_ok=True)
-    out_csv = OUTPUTS_TABLES / "kappa_results.csv"
+    out_csv = OUTPUTS_TABLES / (args.output if args.output else "kappa_results.csv")
     save_df = kt[["display", "kappa", "agreement_pct"]].rename(columns={
         "display": "label", "agreement_pct": "agreement_pct"
     })
