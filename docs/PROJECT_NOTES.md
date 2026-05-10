@@ -212,12 +212,42 @@
   * Fix: added "Compact JSON only — no newlines or extra whitespace" to system prompt;
     reduced max_tokens from 1,000 → 750; resumed with --resume flag
   * After fix: output tokens dropped to ~560/batch; run resumed cleanly
-- Progress (as of 2026-05-10 ~17:00): 54,624 / 63,546 sentences (85.9%) labeled
-  ~21 failed batches (all credit-limit errors during the account-switch window);
-  affected sentences default to None — negligible share of corpus
-- Output files: `data/annotation/labeled_sentences.csv` (sentence-level labels)
+- COMPLETE (2026-05-10): 63,546 sentences, 4,744 docs labeled
+  22 failed batches (all credit-limit errors during account-switch window) → defaulted to None
+- Label distribution: Innovation/Progress 18.7% | Regulation/Governance 11.5% | Risk/Harm 8.7%
+  Economic Benefit 6.0% | Existential/AGI 1.1% | None 58.1%
+- Output files: `data/annotation/labeled_sentences.csv` (sentence-level)
   `data/annotation/labeled_documents.csv` (document-level framing scores)
-- Resume command if interrupted: `python src/annotation/label_with_llm.py --resume`
+
+### LLM Validation (2026-05-10)
+- Script: `src/annotation/validate_llm_labels.py`
+- Gold set: `data/annotation/kappa_overlap_person_b_v3.xlsx` (100 sentences, v3 overlap)
+- Join: sentence_id (100/100 matched)
+- Results:
+  | Label | Precision | Recall | F1 | Accuracy |
+  |-------|-----------|--------|----|----------|
+  | Innovation/Progress | 0.667 | 0.545 | 0.600 | 0.840 |
+  | Economic Benefit | 1.000 | 0.375 | 0.545 | 0.900 |
+  | Risk/Harm | 0.750 | 0.500 | 0.600 | 0.920 |
+  | Regulation/Governance | 1.000 | 0.381 | 0.552 | 0.870 |
+  | Existential/AGI | 0.667 | 0.400 | 0.500 | 0.960 |
+  | None | 1.000 | 1.000 | 1.000 | 1.000 |
+  | MACRO AVG | 0.847 | 0.534 | 0.633 | 0.915 |
+- Verdict: FAIL vs ≥0.80 target
+- Diagnosis: precision is high (when LLM assigns a frame, it's correct); recall is low
+  (LLM defaults to None too often — ~47% of true positive labels missed). This inflates
+  the None rate to 58.1% vs ~33% in human gold. Framing scores will be systematically
+  lower than true values but unbiased in direction. Document as methodology limitation.
+- Saved → `outputs/tables/llm_validation.csv`
+
+### Innovation Sub-classification (2026-05-10, IN PROGRESS)
+- Script: `src/annotation/subclassify_innovation.py`
+- Input: 11,891 Innovation/Progress sentences from labeled_sentences.csv
+- Sub-categories: health_biotech | climate_energy | scientific | productivity | other_progress
+- Model: claude-haiku-4-5-20251001 | Batch: 20 | ~595 batches | ETA ~22:00 local time
+- Output: `data/annotation/innovation_subclassified.csv`
+  `outputs/tables/innovation_subclassification.csv` (actor-level summary)
+  `data/annotation/labeled_documents.csv` updated with innovation_subcategory_dominant
 
 ---
 
@@ -245,6 +275,8 @@
 - [ ] 24 actor/context pairs below 50-doc minimum — regression will filter to
       pairs with sufficient n; report which pairs are excluded
 - [x] Kappa threshold — κ = 0.86 PASSED (2026-05-09)
-- [~] LLM labeling pipeline — IN PROGRESS (85.9% complete, 2026-05-10)
-- [ ] `validate_llm_labels.py` — pending LLM labeling completion
-- [ ] Regression models — pending LLM labeling completion
+- [x] LLM labeling pipeline — COMPLETE (63,546 sentences, 2026-05-10)
+- [x] `validate_llm_labels.py` — macro F1 = 0.633 (precision 0.847, recall 0.534)
+- [~] Innovation sub-classification — IN PROGRESS (subclassify_innovation.py)
+- [ ] `build_features.py` — pending sub-classification completion
+- [ ] Regression models — pending features

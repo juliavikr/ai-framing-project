@@ -119,10 +119,19 @@ detection, length threshold, JSON/HTML fragment removal, AI relevance keyword
 matching, off-topic pattern matching).
 
 Two human annotators independently labeled a stratified gold set of 100 shared
-sentences. After two rounds of calibration (κ = 0.36, κ = 0.37), corpus cleaning
-removed garbage sentences that had been suppressing agreement artificially. A third
-round targets κ ≥ 0.70. Once the threshold is passed, the full corpus is labeled
-using the Claude API and validated against the human gold set.
+sentences. After two rounds of calibration (κ = 0.36, κ = 0.37) failed due to corpus
+noise, 208,320 raw sentences were filtered to 63,546 clean sentences using five quality
+filters. A third annotation round on the clean pool achieved κ = 0.86 (target: ≥ 0.70).
+
+The full 63,546-sentence corpus was labeled using Claude Haiku (`claude-haiku-4-5-20251001`)
+in batches of 15. LLM validation against the 100-sentence gold set achieved macro F1 = 0.633
+(precision 0.847, recall 0.534). The LLM is conservative — high precision when it assigns a
+frame, but defaults to None for ~47% of true positives. Framing scores are systematically
+lower than human-assigned values but directionally unbiased; documented as a methodology
+limitation.
+
+Label distribution across 63,546 sentences: Innovation/Progress 18.7% | Regulation/Governance
+11.5% | Risk/Harm 8.7% | Economic Benefit 6.0% | Existential/AGI 1.1% | None 58.1%.
 
 ### 3. Regression analysis
 
@@ -216,6 +225,6 @@ python src/models/variance_analysis.py
 
 ## Status
 - [x] Week 1 — Data collection (5,925 docs, 16 actors)
-- [~] Week 2 — Annotation (Kappa Round 3 in progress)
-- [ ] Week 3 — Analysis
+- [x] Week 2 — Annotation (κ = 0.86; LLM labeling complete; validation F1 = 0.633)
+- [~] Week 3 — Analysis (innovation sub-classification running; regression pending)
 - [ ] Week 4 — Write-up

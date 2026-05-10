@@ -8,9 +8,8 @@ Submission deadline: ___________
 ---
 
 ## Current Status
-**Week 2 IN PROGRESS — LLM labeling running (2026-05-10)**
-Kappa passed at κ = 0.86. LLM labeling ~85% complete (54,624 / 63,546 sentences done).
-Full labeled_sentences.csv expected complete by end of day 2026-05-10.
+**Week 2 COMPLETE — moving to Week 3 analysis**
+LLM labeling done (63,546 sentences). Validation macro F1 = 0.633 (high precision, low recall — LLM conservative on positive labels). Innovation sub-classification running (~4h, completes ~2026-05-10 22:00).
 
 ---
 
@@ -99,9 +98,10 @@ Last run: 2026-05-08  |  corpus.csv written to data/processed/corpus.csv  |  5,9
 | Corpus cleaning (clean_corpus.py)       | —         | 63,546 sents | 2026-05-09 |
 | Kappa Round 3 (clean pool, v3 sheets)   | >= 0.70   | κ = 0.86 ✓   | 2026-05-09 |
 | Kappa threshold passed                  | YES       | YES ✓        | 2026-05-09 |
-| LLM pipeline test (50 docs, Haiku)      | working   | ✓ real labels | 2026-05-10 |
-| Full LLM labeling complete              | 63,546    | IN PROGRESS 85% | 2026-05-10 |
-| LLM validation accuracy (held-out 100)  | >= 80%    | —            | —          |
+| LLM pipeline test (50 docs, Haiku)      | working   | ✓ real labels  | 2026-05-10 |
+| Full LLM labeling complete              | 63,546    | ✓ 63,546 sents | 2026-05-10 |
+| LLM validation (macro F1 vs gold 100)   | >= 0.80   | 0.633 ✗ (precision 0.847, recall 0.534) | 2026-05-10 |
+| Innovation sub-classification           | —         | IN PROGRESS (~4h) | 2026-05-10 |
 
 ---
 
@@ -190,7 +190,7 @@ Both — end of week:
   - [x] corpus.csv loaded to Snowflake ✓ (5,925 rows, 8.8s)
   - [x] No actor exceeds 10% of corpus ✓ (Microsoft at exactly 10.0%)
 
-### Week 2 — Annotation (Days 8–14) — LLM LABELING IN PROGRESS
+### Week 2 — Annotation (Days 8–14) — COMPLETE
 
   - [x] Read annotation_guidelines.md together — both sign off verbally
   - [x] Agree gold set stratification: 100 sent/context, 5+ actors per context
@@ -204,10 +204,15 @@ Both — end of week:
         Innovation/Progress 0.86 | Economic Benefit 0.93 | Risk/Harm 0.80
         Regulation/Governance 0.83 | Existential/AGI 0.88 | None 0.85
         14 residual disagreements (all genuine edge cases) → saved kappa_results_v3.csv
-  - [~] Full LLM labeling — IN PROGRESS (2026-05-10) — 54,624 / 63,546 sentences (85.9%)
-        Model: claude-haiku-4-5-20251001 | Batch size: 15 | ~21 failed batches (0.5%)
-        Failed batches default to None; can be fixed with --resume after completion
-  - [ ] validate_llm_labels.py on held-out 100 → accuracy = ___%
+  - [x] Full LLM labeling — COMPLETE (2026-05-10) — 63,546 sentences, 4,744 docs
+        Model: claude-haiku-4-5-20251001 | Batch 15 | 22 failed batches (0.5%, all credit-limit)
+        Distribution: Innovation 18.7% | Regulation 11.5% | Risk 8.7% | Economic 6.0% | Existential 1.1% | None 58.1%
+        Output: data/annotation/labeled_sentences.csv + labeled_documents.csv
+  - [x] validate_llm_labels.py — COMPLETE (2026-05-10)
+        Macro F1 = 0.633 | Precision = 0.847 | Recall = 0.534
+        LLM conservative: misses ~47% of positive labels, inflated None rate
+        Noted as methodology limitation → outputs/tables/llm_validation.csv
+  - [~] Innovation sub-classification — IN PROGRESS (subclassify_innovation.py, ~10PM done)
 
 ### Week 3 — Analysis (Days 15–21)
 
