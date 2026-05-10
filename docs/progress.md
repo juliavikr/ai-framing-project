@@ -8,8 +8,13 @@ Submission deadline: ___________
 ---
 
 ## Current Status
-**Week 2 COMPLETE — moving to Week 3 analysis**
-LLM labeling done (63,546 sentences). Validation macro F1 = 0.633 (high precision, low recall — LLM conservative on positive labels). Innovation sub-classification running (~4h, completes ~2026-05-10 22:00).
+**Week 2 COMPLETE — Week 3 analysis BLOCKED on sub-classification restart**
+
+LLM labeling done (63,546 sentences). Validation macro F1 = 0.633. Innovation sub-classification was interrupted at batch 418/595 when Anthropic credits ran out — no output was saved (original script had no streaming write). Script has now been fixed with streaming write, `--resume`, and `--finalize` flags. Need ~$1 more in Anthropic credits to finish the remaining ~155 batches (~3,100 sentences).
+
+**Immediate next step:** Add credits → `python src/annotation/subclassify_innovation.py --resume`
+
+**End goal:** OLS regression (Models 1–3) on risk_score, innovation_score, regulation_score as DVs, testing whether context predicts framing (H1), whether commercial/policy contexts predict expected frames (H2), and whether individuals vary more across contexts than institutions (H3). Paper submitted Week 4.
 
 ---
 
@@ -212,7 +217,10 @@ Both — end of week:
         Macro F1 = 0.633 | Precision = 0.847 | Recall = 0.534
         LLM conservative: misses ~47% of positive labels, inflated None rate
         Noted as methodology limitation → outputs/tables/llm_validation.csv
-  - [~] Innovation sub-classification — IN PROGRESS (subclassify_innovation.py, ~10PM done)
+  - [~] Innovation sub-classification — INTERRUPTED at batch 418/595 (credit exhaustion, 2026-05-10)
+        Script fixed with streaming write + --resume + --finalize flags
+        BLOCKED: need ~$1 Anthropic credits to finish remaining ~155 batches
+        Restart: python src/annotation/subclassify_innovation.py --resume
 
 ### Week 3 — Analysis (Days 15–21)
 

@@ -240,12 +240,24 @@
   lower than true values but unbiased in direction. Document as methodology limitation.
 - Saved → `outputs/tables/llm_validation.csv`
 
-### Innovation Sub-classification (2026-05-10, IN PROGRESS)
+### Innovation Sub-classification (2026-05-10, INTERRUPTED — awaiting credits)
 - Script: `src/annotation/subclassify_innovation.py`
 - Input: 11,891 Innovation/Progress sentences from labeled_sentences.csv
 - Sub-categories: health_biotech | climate_energy | scientific | productivity | other_progress
-- Model: claude-haiku-4-5-20251001 | Batch: 20 | ~595 batches | ETA ~22:00 local time
-- Output: `data/annotation/innovation_subclassified.csv`
+- Model: claude-haiku-4-5-20251001 | Batch: 20 | 595 batches total
+- Run terminated at batch 418/595 (70%) — Anthropic account exhausted (~$16 total spent)
+- **Critical bug found:** original script accumulated all results in memory, wrote only at end.
+  When killed, all 418 batches of work was lost. No output file exists.
+- **Fix applied (2026-05-10):** rewrote script with:
+  - Per-batch streaming write to OUTPUT_CSV (append mode, like label_with_llm.py)
+  - `--resume` flag: reads done sentence_ids from OUTPUT_CSV on startup, skips them
+  - `--finalize` flag: skips API calls entirely, builds summaries from existing OUTPUT_CSV
+  - Header written only on first batch; fresh run removes stale OUTPUT_CSV before starting
+- **Restart command:** `python src/annotation/subclassify_innovation.py --resume`
+- **Cost to finish:** ~155 remaining batches × $0.0005/batch ≈ $0.08–0.10 (estimated)
+- **BLOCKED:** needs ~$1 added to Anthropic account
+- Output (once complete):
+  `data/annotation/innovation_subclassified.csv` (sentence-level, streamed)
   `outputs/tables/innovation_subclassification.csv` (actor-level summary)
   `data/annotation/labeled_documents.csv` updated with innovation_subcategory_dominant
 
@@ -277,6 +289,15 @@
 - [x] Kappa threshold — κ = 0.86 PASSED (2026-05-09)
 - [x] LLM labeling pipeline — COMPLETE (63,546 sentences, 2026-05-10)
 - [x] `validate_llm_labels.py` — macro F1 = 0.633 (precision 0.847, recall 0.534)
-- [~] Innovation sub-classification — IN PROGRESS (subclassify_innovation.py)
+- [~] Innovation sub-classification — BLOCKED (needs ~$1 Anthropic credits; script fixed with streaming write + resume)
 - [ ] `build_features.py` — pending sub-classification completion
-- [ ] Regression models — pending features
+- [ ] Regression models (Models 1–3 for risk_score, innovation_score, regulation_score) — pending features
+- [ ] variance_analysis.py — test H3 (individuals vary more than institutions across contexts)
+- [ ] Paper write-up — Week 4 goal
+
+**End product goal:**
+The final deliverable is an academic paper testing strategic framing adaptation in AI discourse.
+Three OLS models answer H1 (does context predict framing?), H2 (commercial → innovation/economic;
+policy → risk/regulation?), and H3 (do individuals adapt more than institutions?).
+Inputs: labeled_documents.csv framing scores. Outputs: regression tables in outputs/tables/,
+framing variance figures in outputs/figures/, submitted Week 4.
