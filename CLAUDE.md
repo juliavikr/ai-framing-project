@@ -7,7 +7,7 @@ To what extent do actors adapt their framing of AI across contexts
 
 **Team:** 2 people | **Timeline:** 4 weeks | **Target documents: ~6,000
 
-## Current Status — Week 2: Annotation COMPLETE — proceed to LLM labeling
+## Current Status — Week 2: LLM Labeling IN PROGRESS (2026-05-10)
 
 | Milestone | State |
 |-----------|-------|
@@ -20,7 +20,8 @@ To what extent do actors adapt their framing of AI across contexts
 | Kappa Round 2 (κ = 0.37) | FAIL — root cause: corpus noise, not guidelines |
 | Corpus cleaning | COMPLETE — clean_corpus.py (5 filters, 69.5% removed) |
 | Kappa Round 3 (κ = 0.86) | PASS ✓ — 2026-05-09 |
-| LLM labeling | NEXT — κ gate cleared |
+| LLM labeling | IN PROGRESS — ~85% complete (claude-haiku-4-5-20251001) |
+| validate_llm_labels.py | NEXT — after labeling completes |
 | Regression | PENDING |
 
 ---

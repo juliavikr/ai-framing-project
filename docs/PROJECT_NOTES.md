@@ -201,6 +201,24 @@
   Guidelines and calibration examples were effective once the noise was removed.
 - **Next step:** proceed to full LLM labeling (`label_with_llm.py`)
 
+### LLM Labeling (2026-05-10)
+- Model: `claude-haiku-4-5-20251001` via Anthropic Messages API
+- Batch size: 15 sentences per call | max_tokens: 750 | inter-call delay: 0.3s
+- API issues encountered and resolved:
+  * Anthropic account #1: zero credits → switched API key
+  * OpenAI attempted but also zero credits → reverted to Anthropic
+  * New Anthropic account ($8 credits) ran out at ~22,000 sentences (1,000 docs)
+    Root cause: Haiku was pretty-printing JSON (~1,000 tokens/batch vs ~560 compact)
+  * Fix: added "Compact JSON only — no newlines or extra whitespace" to system prompt;
+    reduced max_tokens from 1,000 → 750; resumed with --resume flag
+  * After fix: output tokens dropped to ~560/batch; run resumed cleanly
+- Progress (as of 2026-05-10 ~17:00): 54,624 / 63,546 sentences (85.9%) labeled
+  ~21 failed batches (all credit-limit errors during the account-switch window);
+  affected sentences default to None — negligible share of corpus
+- Output files: `data/annotation/labeled_sentences.csv` (sentence-level labels)
+  `data/annotation/labeled_documents.csv` (document-level framing scores)
+- Resume command if interrupted: `python src/annotation/label_with_llm.py --resume`
+
 ---
 
 ## Key decisions log
@@ -214,6 +232,8 @@
 | Clean corpus before Round 3 | Revise guidelines a third time | Root cause was data quality, not label ambiguity — guidelines had already been updated once with no effect |
 | Snowflake for storage | Local CSV only; PostgreSQL | Shared access between 2 teammates; free trial; heavy queries run in warehouse |
 | ingest_pdf.py with pdfplumber | PyMuPDF; manual text copy | pdfplumber handles column layouts better; pure Python |
+| Haiku for LLM labeling | Claude Sonnet (original plan); GPT-4.1-mini | Cheapest option with sufficient label quality; ~$10 for full corpus |
+| Compact JSON instruction in prompt | Smaller batch size to reduce output | Haiku pretty-prints by default (~1,000 tokens); one instruction line halved output cost |
 
 ---
 
@@ -225,6 +245,6 @@
 - [ ] 24 actor/context pairs below 50-doc minimum — regression will filter to
       pairs with sufficient n; report which pairs are excluded
 - [x] Kappa threshold — κ = 0.86 PASSED (2026-05-09)
-- [ ] LLM labeling pipeline (`label_with_llm.py`) — NEXT
-- [ ] `validate_llm_labels.py` — pending LLM labeling
-- [ ] Regression models — pending LLM labeling
+- [~] LLM labeling pipeline — IN PROGRESS (85.9% complete, 2026-05-10)
+- [ ] `validate_llm_labels.py` — pending LLM labeling completion
+- [ ] Regression models — pending LLM labeling completion

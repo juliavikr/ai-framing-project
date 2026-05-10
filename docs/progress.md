@@ -8,8 +8,9 @@ Submission deadline: ___________
 ---
 
 ## Current Status
-**Week 1 COMPLETE — moving to Week 2 annotation**
-All automated scraping done; 21 manual PDFs ingested; corpus.csv written (5,946 docs).
+**Week 2 IN PROGRESS — LLM labeling running (2026-05-10)**
+Kappa passed at κ = 0.86. LLM labeling ~85% complete (54,624 / 63,546 sentences done).
+Full labeled_sentences.csv expected complete by end of day 2026-05-10.
 
 ---
 
@@ -98,8 +99,8 @@ Last run: 2026-05-08  |  corpus.csv written to data/processed/corpus.csv  |  5,9
 | Corpus cleaning (clean_corpus.py)       | —         | 63,546 sents | 2026-05-09 |
 | Kappa Round 3 (clean pool, v3 sheets)   | >= 0.70   | κ = 0.86 ✓   | 2026-05-09 |
 | Kappa threshold passed                  | YES       | YES ✓        | 2026-05-09 |
-| LLM pipeline test (50 sentences)        | >= 80%    | —            | —          |
-| Full LLM labeling complete              | ~6,000    | —            | —          |
+| LLM pipeline test (50 docs, Haiku)      | working   | ✓ real labels | 2026-05-10 |
+| Full LLM labeling complete              | 63,546    | IN PROGRESS 85% | 2026-05-10 |
 | LLM validation accuracy (held-out 100)  | >= 80%    | —            | —          |
 
 ---
@@ -189,7 +190,7 @@ Both — end of week:
   - [x] corpus.csv loaded to Snowflake ✓ (5,925 rows, 8.8s)
   - [x] No actor exceeds 10% of corpus ✓ (Microsoft at exactly 10.0%)
 
-### Week 2 — Annotation (Days 8–14) — KAPPA PASSED, LLM LABELING NEXT
+### Week 2 — Annotation (Days 8–14) — LLM LABELING IN PROGRESS
 
   - [x] Read annotation_guidelines.md together — both sign off verbally
   - [x] Agree gold set stratification: 100 sent/context, 5+ actors per context
@@ -203,8 +204,9 @@ Both — end of week:
         Innovation/Progress 0.86 | Economic Benefit 0.93 | Risk/Harm 0.80
         Regulation/Governance 0.83 | Existential/AGI 0.88 | None 0.85
         14 residual disagreements (all genuine edge cases) → saved kappa_results_v3.csv
-  - [ ] LLM pipeline: test on 50 sentences, accuracy = ___%
-  - [ ] Full LLM labeling run on all ~6,000 docs
+  - [~] Full LLM labeling — IN PROGRESS (2026-05-10) — 54,624 / 63,546 sentences (85.9%)
+        Model: claude-haiku-4-5-20251001 | Batch size: 15 | ~21 failed batches (0.5%)
+        Failed batches default to None; can be fixed with --resume after completion
   - [ ] validate_llm_labels.py on held-out 100 → accuracy = ___%
 
 ### Week 3 — Analysis (Days 15–21)

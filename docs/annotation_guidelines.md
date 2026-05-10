@@ -18,6 +18,56 @@ Never leave a sentence with no decision — it must have at least one label or e
 
 ---
 
+## The None Boundary — Critical Rules
+### (These resolve the most common disagreements)
+
+---
+
+**RULE 1 — Innovation/Progress requires an explicit claim about societal benefit or
+meaningful AI advancement. Descriptive statements about what AI does or how it works
+are NOT enough.**
+
+```
+✔  "AI will revolutionize how we diagnose cancer"
+✔  "This represents a fundamental leap in machine reasoning"
+✘  "Neural networks have rich internal structure"           → None
+✘  "The model works like a classically-trained pianist"     → None
+```
+
+The test: is the sentence *claiming* something transformative will happen, or merely
+*describing* how AI functions? Description → None. Claim → Innovation/Progress.
+
+---
+
+**RULE 2 — Economic Benefit requires a concrete claim about jobs, revenue, productivity,
+or national competitiveness. Product announcements, skills programmes, and observational
+trend statements do NOT qualify.**
+
+```
+✔  "This will add $15 trillion to global GDP"
+✔  "This will create new job categories in data science"
+✔  "Companies adopting AI see 40% productivity gains"
+✘  "Claude Opus is now available to all paid users"         → None
+✘  "We offer skills programmes for employees"               → None
+✘  "Compensation reflects current market trends"            → None
+```
+
+The test: is there an explicit quantified or directional economic outcome? If you have to
+*infer* the economic benefit, it doesn't qualify.
+
+---
+
+**RULE 3 — None is correct for:**
+- Purely procedural or administrative sentences
+- Descriptive technical statements with no evaluative claim
+- Transitional phrases and connectors
+- Sentences that *imply* a frame but do not *state* it
+
+The test: would a reasonable reader say this sentence is **making a claim** about AI's
+role in the world? If no → None. If yes → assign the frame.
+
+---
+
 ## The 5 Frames
 
 ---
@@ -309,3 +359,122 @@ Select 600 sentences stratified as follows:
 
 This stratification ensures the gold set reflects the full diversity of your corpus,
 not just the easiest cases.
+
+---
+
+## Calibration Examples — From Kappa Round 1 Disagreements
+
+These are real sentences from the corpus where A and B disagreed. Each entry shows
+the correct label, which rule settles it, and the reasoning. Use these to calibrate
+before re-annotating.
+
+---
+
+**[C1] Dario Amodei | public | 2024-11-11**
+> "But I think that there is an incredibly rich structure to be discovered inside
+> neural networks, a lot of very deep beauty if we're just willing to take the time
+> to go and see it and understand it."
+
+Correct label: **None**
+Rule: RULE 1. This *describes* what neural networks contain — it makes no claim about
+societal benefit or scientific advancement. Beauty ≠ progress claim.
+
+---
+
+**[C2] Google DeepMind | commercial | 2019-06-25**
+> "For example, a classically-trained pianist can pick up jazz piano with relative ease."
+
+Correct label: **None**
+Rule: RULE 1. An analogy used to illustrate transfer learning. No societal claim, no
+progress claim — it is describing a concept, not asserting advancement.
+
+---
+
+**[C3] Dario Amodei | commercial | 2026-02-25**
+> "We are keeping Claude Opus 3 available post-retirement on claude.ai to all paid
+> users, and making it available by request on the API."
+
+Correct label: **None**
+Rule: RULE 2. A product availability announcement. No economic claim is made — you
+would have to *infer* a business motive, which does not qualify.
+
+---
+
+**[C4] Sam Altman | public | 2024-03-18**
+> "I find it often to be significantly better than even Wikipedia on well-covered topics."
+
+Correct label: **None**
+Rule: RULE 2. A comparative performance observation. No economic benefit is stated or
+quantified — this is an informal quality claim, not an economic framing.
+
+---
+
+**[C5] UK DSIT | policy | 2026-01-30**
+> "TechExpert is part of TechFirst, the government's skills programme opening pathways
+> into the UK's fast-growing tech sector."
+
+Correct label: **Economic Benefit**
+Rule: RULE 2 (positive case). "Opening pathways into the UK's fast-growing tech sector"
+is an explicit economic opportunity claim — job creation and sector growth are stated,
+not implied. Contrast with [C3] and [C4] where no economic outcome is stated.
+
+---
+
+**[C6] OpenAI | commercial | 2025-07-17**
+> "We believe this is not high enough accuracy for standalone detection and needs to be
+> paired with metadata-based approaches, human judgment, and public education to be
+> more effective."
+
+Correct label: **None**
+Rule: RULE 3. A technical limitation statement. The sentence notes a shortcoming of a
+detection tool but makes no claim about harm to anyone — it is a design recommendation,
+not a Risk/Harm frame.
+
+---
+
+**[C7] Dario Amodei | commercial | 2026-03-05**
+> "Anthropic did not leak this post nor direct anyone else to do so — it is not in our
+> interest to escalate this situation."
+
+Correct label: **None**
+Rule: RULE 3. Purely administrative/defensive. No framing claim about AI's role in the
+world whatsoever.
+
+---
+
+**[C8] Sam Altman | commercial | 2020-02-26**
+> "As compensation packages from the giant tech companies continue to increase,
+> I suspect this will become a trend."
+
+Correct label: **None**
+Rule: RULE 2 + RULE 3. An observational statement about a labour market trend — not a
+claim that AI is creating economic benefit. The subject is compensation, not AI outcomes.
+
+---
+
+**[C9] Mark Zuckerberg | commercial | 2026-02-09**
+> "Building for Everyone: During a collaborative design workshop with the Oscar Mike
+> Foundation, veterans with memory loss and traumatic brain injuries explained their
+> daily challenges, and how our [products help them]."
+
+Correct label: **None**
+Rule: RULE 3. Procedural description of a design workshop. It implies a positive use
+case but makes no explicit claim about AI's role or benefit. Apply the making-a-claim
+test: no explicit claim → None.
+
+---
+
+**[C10] Demis Hassabis | public | 2025-07-23**
+> "If you take a step back and look at all the work we've done, especially with the
+> Alpha X projects — AlphaGo, AlphaFold — what they really showed is that AI can make
+> fundamental scientific breakthroughs."
+
+Correct label: **Innovation/Progress**
+Rule: RULE 1 (positive case). This is an explicit claim that AI has produced
+*fundamental scientific breakthroughs* — not a description of how it works, but a
+claim about what it achieved for science. Contrast with [C1] and [C2].
+
+---
+
+*These 10 examples resolve 20 of the 28 Round 1 disagreements. The remaining 8 are
+genuinely ambiguous edge cases — flag them in Notes and treat them as multi-label.*

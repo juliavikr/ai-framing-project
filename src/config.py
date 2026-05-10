@@ -358,9 +358,9 @@ SNOWFLAKE_TABLE = "CORPUS"
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 NEWS_API_KEY      = os.getenv("NEWS_API_KEY")
 
-LLM_MODEL      = "claude-sonnet-4-20250514"
-LLM_BATCH_SIZE = 20
-LLM_MAX_TOKENS = 1000
+LLM_MODEL      = "claude-haiku-4-5-20251001"
+LLM_BATCH_SIZE = 15
+LLM_MAX_TOKENS = 750
 
 REGRESSION_DVS = ["risk_score", "innovation_score", "regulation_score"]
 FIGURE_DPI     = 300
