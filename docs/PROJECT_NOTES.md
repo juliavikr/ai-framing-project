@@ -632,6 +632,279 @@ variance than all qualifying companies except Microsoft on risk. Formally untest
 
 ---
 
+## Regression Framework — Complete Documentation
+
+### What the analysis measures
+
+Each document is reduced to a vector of framing scores. For frame F:
+
+```
+framing_score_F = (sentences labeled F in document) / (total sentences in document)
+```
+
+This is a 0–1 proportion. A 20-sentence document with 5 Innovation/Progress labels gets
+innovation_score = 0.25. Framing scores are the dependent variables in all regressions.
+
+**Why document-level proportions:** Sentence-level labels are too sparse for actor
+comparisons (58% are None). Aggregating to documents gives a continuous, interpretable
+DV that smooths over within-document variation. Documents with fewer than 5 sentences
+are excluded (3,411 removed), leaving 2,535 in the analytical dataset.
+
+### Three dependent variables
+
+| DV | Sentence freq. | LLM recall | Theoretical role |
+|----|---------------|------------|-----------------|
+| innovation_score | 18.7% | 0.45–0.56 by context | H1/H2: commercial vs. policy contrast |
+| risk_score | 8.7% | 0.22–0.29 by context | H1/H2: policy specialisation |
+| regulation_score | 11.5% | 0.38–0.40 by context | H1/H2: strongest policy signal |
+
+**Why not Economic Benefit:** LLM recall = 0.00 in the policy context — the frame is
+invisible to the annotator in the exact context where cross-context variation is tested.
+Any regression coefficient would measure annotation dropout, not real framing.
+
+**Why not Existential/AGI:** 1.1% sentence frequency produces near-zero document-level
+variance. OLS coefficients would be numerically unstable and substantively uninterpretable.
+The frame is also concentrated in 2–3 actors, not a corpus-wide signal.
+
+### Interpreting β coefficients
+
+In OLS on a 0–1 proportion DV, β = expected change in framing proportion per unit change
+in predictor, holding all others constant.
+
+Examples from actual results:
+- β_policy = +0.136 for regulation_score → policy documents contain 13.6 percentage points
+  more regulation framing than commercial documents, on average, controlling for time.
+- β_post_chatgpt = +0.048 for innovation_score → documents published after November 30,
+  2022 contain 4.8pp more innovation framing than pre-ChatGPT documents, controlling for
+  context.
+- β_(Nadella × policy) = +0.271 for innovation_score → Nadella's policy documents contain
+  27.1pp more innovation framing than the model would predict from his commercial baseline
+  plus the average policy effect. This residual is the interaction: individual strategic
+  adaptation above and beyond the average context shift.
+
+**Reference categories (what dummies are measured against):**
+- Context: commercial (most frequent at 61.8%)
+- Positioning: capability
+- Platform: blog
+- Actor type: individual
+
+**Interpreting R²:** Fraction of total DV variance explained by the model. Social science
+text analysis norms: R²=0.05–0.15 for a single contextual predictor; R²>0.15 is strong.
+The regulation DV reaches R²=0.221 in M3 — policy context and positioning together explain
+22.1% of regulation framing variance, which is high for behavioral text data.
+
+---
+
+### Model 1 — Baseline: Does context predict framing? (H1)
+
+**Purpose:** Minimal, interpretable test of H1. Establishes that context has an independent
+effect on framing before introducing actor identity or structural controls.
+
+**Specification:**
+```
+Frame_score_d = β₀ + β₁·C(context_d) + β₂·post_chatgpt_d + ε_d
+```
+- N = 2,535 documents
+- Only two predictors: context (commercial/policy/public) and a pre/post-ChatGPT binary
+- Any actor-specific or platform-specific patterns are absorbed into the residual
+- Simple enough to communicate the core H1 test without multicollinearity concerns
+
+**Results:**
+
+| DV | R² | β_policy | β_public | β_post_chatgpt |
+|----|-----|---------|---------|---------------|
+| innovation_score | 0.014 | −0.023 * | +0.034 ns | +0.048 *** |
+| risk_score | 0.041 | +0.055 *** | −0.043 *** | +0.016 * |
+| regulation_score | 0.121 | +0.136 *** | −0.043 ** | +0.023 ** |
+
+*** p<0.001 / ** p<0.01 / * p<0.05 / ns not significant
+
+**Interpretation:**
+- Context is significant for all three DVs → H1 confirmed.
+- Regulation shows the cleanest context effect: policy documents carry 13.6pp more
+  regulation framing than commercial. This alone explains 12.1% of variation (R²=0.121).
+- Risk follows the same direction as regulation: policy +5.5pp, public −4.3pp — risk framing
+  is highest when actors are addressing policymakers, lowest in media/public settings.
+- Innovation shows a negative policy coefficient (−2.3pp): commercial is the innovation
+  context. This is the H2 inversion — the commercial baseline is high, so policy deflects
+  downward. Public is not significantly different from commercial for innovation.
+- Post-ChatGPT effect is positive for all three frames: the discursive field intensified
+  across all dimensions after ChatGPT launched (November 2022).
+- Low R² values (especially innovation at 0.014) signal that context alone leaves most
+  framing variance unexplained. Actor-level factors are needed (Model 2).
+
+---
+
+### Model 2 — Strategic adaptation: Which actors shift framing across contexts? (H2/H3)
+
+**Purpose:** Test whether specific actors adapt their framing beyond the average context
+effect. The interaction term (Actor × Context) is the headline test: a positive, significant
+interaction means that actor frames differently in that context than the baseline would
+predict — i.e., strategic adaptation.
+
+**Specification:**
+```
+Frame_score_d = β₀ + β₁·C(actor_d) + β₂·C(context_d) + β₃·C(actor_d):C(context_d) + ε_d
+```
+- N = 636 documents
+- Restricted to actor×context pairs with ≥50 docs AND actors present in ≥2 contexts
+  (below 50 docs, OLS interaction estimates have inflated standard errors and near-degenerate df)
+- Qualifying actors: Microsoft (commercial n=84, policy n=152), OpenAI (commercial n=194,
+  policy n=81), Satya Nadella (commercial n=59, policy n=66)
+- Public context excluded: only Microsoft and Nadella have public docs; combined cell
+  produces degenerate estimates (β ≈ −3.57e-17, spurious p=0.006) — report only
+  commercial/policy contrasts
+- β₃ interpretation: how much does this actor's framing in this context DEVIATE from
+  what actor effects + context effects alone would predict?
+
+**Results — significant interactions:**
+
+| DV | R² | Actor × Context | β | p | Interpretation |
+|----|-----|-----------------|---|---|----------------|
+| innovation_score | 0.082 | Satya Nadella × policy | +0.271 | <0.001 | Nadella's policy docs are 27.1pp more innovation-framed than his commercial baseline predicts |
+| innovation_score | 0.082 | OpenAI × policy | +0.101 | 0.006 | OpenAI similarly pushes innovation framing when addressing policymakers |
+| risk_score | 0.049 | OpenAI × policy | −0.056 | 0.025 | OpenAI's policy docs are less risk-focused than expected |
+| regulation_score | 0.078 | OpenAI × policy | −0.097 | <0.001 | OpenAI's policy docs avoid regulation language despite the policy context |
+
+**Interpretation:**
+- The Nadella × policy interaction (+0.271***) is the largest and most theoretically
+  significant coefficient in the study. When addressing policymakers, Nadella foregrounds
+  AI as a driver of innovation — the opposite of the risk/regulation framing one might
+  expect in a policy context. This is textbook strategic framing: shaping the policy
+  narrative toward economic opportunity rather than regulatory necessity.
+- OpenAI shows a consistent pattern across all three DVs in the policy context: more
+  innovation, less risk, less regulation. OpenAI appears to actively resist regulatory
+  framing in its policy communications, even while other actors (Microsoft, Nadella) shift
+  toward context-expected patterns.
+- M2 R² = 0.082 for innovation, higher than M1 (0.014), confirming that actor-level
+  heterogeneity explains substantially more of innovation framing variance than context alone.
+
+**Limitation:** Only 3 actors qualify, all from the commercial/tech sector. Results cannot
+be generalised to policymakers or the full 16-actor corpus. State explicitly in paper methodology.
+
+---
+
+### Model 3 — Full controls: What structural factors explain framing? (H2, extended)
+
+**Purpose:** After partialling out actor type, context, positioning, platform, and time,
+identify which structural characteristics are independently associated with framing.
+Positioning (the actor's strategic identity: safety / capability / infrastructure /
+regulator) and platform (where the document was published) are the theoretically central
+additions. Highest explanatory power.
+
+**Specification:**
+```
+Frame_score_d = β₀ + β₁·C(actor_type_d) + β₂·C(context_d) + β₃·C(positioning_d)
+              + β₄·C(platform_d) + β₅·post_chatgpt_d + ε_d
+```
+- N = 2,535 documents
+- Positioning values: capability (Altman, Nadella, Zuckerberg + their companies)
+  / safety (Amodei, Hassabis, Anthropic, Google DeepMind)
+  / infrastructure (Huang, Nvidia)
+  / regulator (EU Commission, US Congress, UK DSIT, White House OSTP)
+- Platform values: blog / speech / research_paper / press_release / testimony /
+  regulatory_doc / interview / earnings_call
+
+**Multicollinearity caution:** The predictor cluster {actor_type=policymaker, context=policy,
+positioning=regulator, platform=regulatory_doc, platform=testimony} is nearly perfectly
+collinear — nearly all policymakers appear exclusively in policy contexts via testimony and
+regulatory_doc platforms. Statsmodels returns unstable, billion-scale coefficients for
+actor_type[T.policymaker] alongside suppressed context[T.policy] terms in this model.
+**Only report positioning and platform terms from M3.** Do not cite actor_type or
+context[T.policy] from M3 as standalone findings.
+
+**Key results — innovation_score (R²=0.064):**
+
+| Predictor | β | p | Interpretation |
+|-----------|---|---|----------------|
+| C(platform)[speech] | +0.145 | 0.009 | Speeches contain 14.5pp more innovation framing than blogs |
+| C(platform)[research_paper] | −0.084 | <0.001 | Research papers have 8.4pp less innovation framing than blogs |
+| C(positioning)[safety] | −0.042 | <0.001 | Safety actors use 4.2pp less innovation framing than capability actors |
+| post_chatgpt | +0.039 | <0.001 | Post-ChatGPT innovation framing up 3.9pp |
+
+**Key results — risk_score (R²=0.079):**
+
+| Predictor | β | p | Interpretation |
+|-----------|---|---|----------------|
+| C(context)[policy] | +0.055 | <0.001 | Policy context: +5.5pp risk framing above commercial |
+| C(context)[public] | −0.043 | <0.001 | Public context: 4.3pp less risk framing than commercial |
+| C(positioning)[safety] | +0.038 | <0.001 | Safety actors carry 3.8pp more risk framing than capability |
+| C(positioning)[infrastructure] | −0.049 | <0.001 | Infrastructure actors (Nvidia/Huang): 4.9pp less risk framing |
+| post_chatgpt | +0.016 | 0.019 | Post-ChatGPT risk framing up 1.6pp |
+
+**Key results — regulation_score (R²=0.221 — highest across all models and DVs):**
+
+| Predictor | β | p | Interpretation |
+|-----------|---|---|----------------|
+| C(positioning)[safety] | +0.050 | <0.001 | Safety actors: 5.0pp more regulation framing |
+| C(platform)[press_release] | +0.043 | <0.001 | Press releases: 4.3pp more regulation framing than blogs |
+| post_chatgpt | +0.035 | <0.001 | Post-ChatGPT regulation framing up 3.5pp |
+| C(platform)[research_paper] | −0.031 | 0.003 | Research papers avoid regulation framing |
+
+**M3 interpretation:**
+- Regulation framing is the most structurally predictable frame (R²=0.221). After controlling
+  for all covariates, safety positioning and the press_release platform independently drive
+  regulation framing — beyond what context alone explains.
+- Safety positioning is a real content predictor, not just a label: safety-positioned actors
+  (Anthropic, Amodei, Hassabis, Google DeepMind) consistently carry more risk and regulation
+  framing and less innovation framing. Their public positioning matches their linguistic output.
+- Infrastructure positioning (Nvidia, Jensen Huang) suppresses risk framing: actors who frame
+  AI as physical infrastructure (chips, compute) discuss societal risk substantially less.
+- Platform drives format: speeches are the most innovation-framed format (public keynotes are
+  optimistic). Research papers resist both innovation and regulation framing — they use
+  technical, not strategic, language. Press releases are regulation-elevated (companies
+  proactively address governance in announcements).
+- Post-ChatGPT intensification is consistent across all three frames and survives full
+  controls — November 2022 marked a genuine discursive shift.
+
+---
+
+### Variance Analysis — H3
+
+**Purpose:** Test whether individual actors adapt their framing more across contexts than
+companies do. H3 predicts individual σ > company σ.
+
+**Method:** For each qualifying actor, compute the standard deviation of mean framing scores
+across their contexts. SD generalises to actors in 3+ contexts and is less sensitive to a
+single outlier than range.
+
+**Qualification criterion:** ≥50 docs in ≥2 distinct contexts.
+
+**Why so few actors qualify (5 of 16):** The 50-doc threshold excludes nearly all individual
+actors. Individual policy/public contexts are structurally thin: congressional testimony is
+paywalled or 403-blocked; podcast transcripts are YouTube-only (captions disabled); conference
+talks are JS-rendered. Only Satya Nadella has full 3-context coverage (Microsoft blog +
+Senate testimony PDFs + WorkLab public content). This is a data availability constraint, not
+an analytical choice — it must be disclosed in the paper's limitations.
+
+**Results:**
+
+| Actor | Type | Contexts | Risk σ | Innovation σ | Regulation σ |
+|-------|------|----------|--------|--------------|--------------|
+| Satya Nadella | individual | comm/pol/pub | 0.050 | **0.129** | **0.064** |
+| Microsoft | company | comm/pol/pub | 0.049 | 0.031 | 0.049 |
+| UK DSIT | policymaker | pol/pub | 0.036 | 0.088 | 0.012 |
+| OpenAI | company | comm/pol | 0.008 | 0.037 | 0.011 |
+| Google DeepMind | company | comm/pub | 0.032 | 0.011 | 0.016 |
+
+**H3 verdict:** Directionally supported, not formally testable.
+- Satya Nadella shows the highest innovation variance (σ=0.129) of any qualifying actor —
+  more than 4× his paired company Microsoft (σ=0.031).
+- Nadella's regulation variance (σ=0.064) also exceeds Microsoft (σ=0.049), though more closely.
+- A t-test (individuals vs. companies) requires ≥2 actors in each group. Only 1 individual
+  qualifies (Nadella). This test cannot be run with the available corpus coverage.
+- Paper framing: present the Nadella/Microsoft comparison as the strongest available
+  individual-level evidence, consistent with H3. Report the corpus limitation explicitly —
+  the absence of evidence for H3 at scale is a data problem, not a finding of no effect.
+
+**Connection to M2:** The Nadella × policy interaction in M2 (+0.271*** on innovation) is the
+regression analogue of the same phenomenon captured by σ=0.129 in the variance analysis.
+Both metrics reflect the same underlying pattern: Nadella's framing shifts substantially
+across contexts. The variance analysis quantifies the magnitude; M2 tests its statistical
+significance and direction.
+
+---
+
 ## Key decisions log
 
 | Decision | Alternatives considered | Reason chosen |
