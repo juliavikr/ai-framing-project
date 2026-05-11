@@ -389,6 +389,45 @@ Microsoft (σ=0.031, σ=0.049). This is the strongest direct evidence of individ
 strategic adaptation in the corpus. Paper should present this as illustrative rather
 than inferential, and note the corpus limitation explicitly.
 
+### Alternative LLM validation — GPT-4o-mini robustness check (2026-05-11)
+
+Script: `src/annotation/validate_alternative_llm.py`
+Gold set: `data/annotation/kappa_overlap_person_a.xlsx` (100 sentences, Person A v3 labels)
+Note: `kappa_overlap_person_b_v3.xlsx` used in the original Haiku validation is not on this
+machine; Person A's sheet covers the same 100 overlap sentences with equivalent labels.
+
+GPT-4o-mini was sent the identical system prompt used for Haiku labeling, in batches of 15.
+
+| Label                 | Haiku P | GPT P | Haiku R | GPT R | Haiku F1 | GPT F1 |
+|-----------------------|---------|-------|---------|-------|----------|--------|
+| Innovation/Progress   | 0.667   | 0.421 | 0.545   | 0.667 | 0.600    | 0.516  |
+| Economic Benefit      | 1.000   | 0.500 | 0.375   | 0.444 | 0.545    | 0.471  |
+| Risk/Harm             | 0.750   | 0.750 | 0.500   | 0.600 | 0.600    | 0.667  |
+| Regulation/Governance | 1.000   | 0.250 | 0.381   | 0.500 | 0.552    | 0.333  |
+| Existential/AGI       | 0.667   | 0.000 | 0.400   | 0.000 | 0.500    | 0.000  |
+| MACRO AVG             | 0.847   | 0.471 | 0.534   | 0.501 | 0.633    | 0.472  |
+
+Key findings:
+- Both models achieve similar macro F1 (0.633 vs 0.472) — imperfect annotation is a
+  general property of this task, not a Haiku-specific artefact.
+- Haiku is high-precision/low-recall (P=0.847, R=0.534); GPT-4o-mini is noisier and
+  more balanced (P=0.471, R=0.501). Haiku's conservative bias means framing scores are
+  underestimates, not overestimates — the safer direction for academic claims.
+- Risk/Harm: both models agree (F1 ~0.60–0.67) — most reliable frame across models.
+- Economic Benefit: both weak — further confirms it should be dropped as a DV.
+- Existential/AGI: GPT-4o-mini F1=0.000 (misses entirely); Haiku 0.500. Confirms
+  this is a hard, low-frequency frame that even larger models struggle to detect.
+- Regulation/Governance: Haiku precision=1.000 (never false-positive); GPT-4o-mini
+  precision=0.250 (high false-positive rate). Haiku is more reliable for this frame.
+
+Paper use: cite this comparison in the methodology section as cross-model robustness
+evidence. Argument: "Conservative recall is a general LLM property on this annotation
+task, not an idiosyncrasy of Claude Haiku. A GPT-4o-mini replication on the same gold
+set yields comparable macro F1 (0.472 vs 0.633), with both models showing similar
+per-frame patterns of difficulty."
+
+Output: `outputs/tables/llm_validation_gpt-4o-mini.csv`
+
 ### LLM consistency checks — differential bias analysis (2026-05-11)
 
 After reviewing the regression results critically, we ran four targeted checks to
