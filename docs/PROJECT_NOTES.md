@@ -136,32 +136,6 @@ EU/US/UK regulatory documents, and public essays. Added 21 docs to the corpus.
 | Policy     | 2,048 | 34.4% | —      | — |
 | Public     | 237   | 4.0%  | ≥15%   | ✗ structural ceiling |
 
-**Per-actor document counts (actual / target):**
-
-| Actor | Commercial | Policy | Public | Total |
-|-------|-----------|--------|--------|-------|
-| Sam Altman | 121 / 130 | 1 / 120 | 3 / 130 | **125** |
-| Dario Amodei | 331 / 120 | 2 / 120 | 3 / 120 | **336** |
-| Jensen Huang | 164 / 150 | 0 / 60 | 10 / 120 | **173** |
-| Satya Nadella | 108 / 120 | 80 / 80 | 47 / 100 | **235** |
-| Mark Zuckerberg | 125 / 120 | 1 / 60 | 3 / 150 | **129** |
-| Demis Hassabis | 105 / 100 | 3 / 80 | 16 / 120 | **124** |
-| OpenAI | 545 / 170 | 135 / 120 | 0 / 80 | **545** |
-| Anthropic | 520 / 150 | 1 / 120 | 35 / 80 | **528** |
-| Google DeepMind | 500 / 150 | 0 / 100 | 51 / 80 | **551** |
-| Meta AI | 533 / 150 | 0 / 90 | 0 / 80 | **533** |
-| Microsoft | 520 / 140 | 39 / 100 | 39 / 80 | **591** |
-| Nvidia | 354 / 150 | 0 / 80 | 6 / 80 | **360** |
-| EU Commission | 395 / 380 | 10 / 100 | — | **405** |
-| US Congress | 246 / 380 | 23 / 70 | — | **269** |
-| UK DSIT | 450 / 350 | 19 / 80 | — | **469** |
-| White House OSTP | 561 / 350 | 0 / 80 | — | **561** |
-| **TOTAL** | | | | **5,946** |
-
-Individual policy/public gaps (Altman, Amodei, Huang, Zuckerberg) are structural:
-congressional testimony blocked at congress.gov/senate.gov; podcast transcripts
-YouTube-only with captions disabled; interview sites JS-rendered or paywalled.
-
 **Balance check (as of 2026-05-08):**
 
 | Rule | Target | Actual | Pass? |
