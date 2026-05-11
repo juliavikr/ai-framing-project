@@ -120,17 +120,58 @@ EU/US/UK regulatory documents, and public essays. Added 21 docs to the corpus.
 
 **5,946 documents** (after PDF ingestion)
 
-| Actor type  | Docs  | Share |
-|-------------|-------|-------|
-| Companies   | 3,111 | 52.3% |
-| Policymakers| 1,704 | 28.7% |
-| Individuals | 1,122 | 18.9% |
+**By actor type:**
 
-| Context    | Docs  | Share |
-|------------|-------|-------|
-| Commercial | 3,661 | 61.6% |
-| Policy     | 2,048 | 34.4% |
-| Public     | 237   | 4.0%  |
+| Actor type   | Docs  | Share | Target | Status |
+|--------------|-------|-------|--------|--------|
+| Companies    | 3,111 | 52.3% | ~35%   | ✗ arXiv inflates |
+| Policymakers | 1,704 | 28.7% | ~30%   | ✓ |
+| Individuals  | 1,122 | 18.9% | ~35%   | ✗ structural gap |
+
+**By context:**
+
+| Context    | Docs  | Share | Target | Status |
+|------------|-------|-------|--------|--------|
+| Commercial | 3,661 | 61.6% | —      | — |
+| Policy     | 2,048 | 34.4% | —      | — |
+| Public     | 237   | 4.0%  | ≥15%   | ✗ structural ceiling |
+
+**Per-actor document counts (actual / target):**
+
+| Actor | Commercial | Policy | Public | Total |
+|-------|-----------|--------|--------|-------|
+| Sam Altman | 121 / 130 | 1 / 120 | 3 / 130 | **125** |
+| Dario Amodei | 331 / 120 | 2 / 120 | 3 / 120 | **336** |
+| Jensen Huang | 164 / 150 | 0 / 60 | 10 / 120 | **173** |
+| Satya Nadella | 108 / 120 | 80 / 80 | 47 / 100 | **235** |
+| Mark Zuckerberg | 125 / 120 | 1 / 60 | 3 / 150 | **129** |
+| Demis Hassabis | 105 / 100 | 3 / 80 | 16 / 120 | **124** |
+| OpenAI | 545 / 170 | 135 / 120 | 0 / 80 | **545** |
+| Anthropic | 520 / 150 | 1 / 120 | 35 / 80 | **528** |
+| Google DeepMind | 500 / 150 | 0 / 100 | 51 / 80 | **551** |
+| Meta AI | 533 / 150 | 0 / 90 | 0 / 80 | **533** |
+| Microsoft | 520 / 140 | 39 / 100 | 39 / 80 | **591** |
+| Nvidia | 354 / 150 | 0 / 80 | 6 / 80 | **360** |
+| EU Commission | 395 / 380 | 10 / 100 | — | **405** |
+| US Congress | 246 / 380 | 23 / 70 | — | **269** |
+| UK DSIT | 450 / 350 | 19 / 80 | — | **469** |
+| White House OSTP | 561 / 350 | 0 / 80 | — | **561** |
+| **TOTAL** | | | | **5,946** |
+
+Individual policy/public gaps (Altman, Amodei, Huang, Zuckerberg) are structural:
+congressional testimony blocked at congress.gov/senate.gov; podcast transcripts
+YouTube-only with captions disabled; interview sites JS-rendered or paywalled.
+
+**Balance check (as of 2026-05-08):**
+
+| Rule | Target | Actual | Pass? |
+|------|--------|--------|-------|
+| Total documents | ≥ 6,000 | 5,946 (99.1%) | ✗ (close) |
+| Largest single actor share | ≤ 10% | Microsoft 10.0% | ✓ (at cap) |
+| Smallest context share | ≥ 15% | Public 4.0% | ✗ structural ceiling |
+| Individuals share | ~35% | 18.9% | ✗ structural gap |
+| Companies share | ~35% | 52.3% | ✗ arXiv |
+| Policymakers share | ~30% | 28.8% | ✓ |
 
 **Known imbalances (all documented as limitations):**
 - arXiv papers inflate company commercial share — classified correctly per spec

@@ -9,24 +9,45 @@ To what extent do actors adapt their framing of AI across contexts
 
 ## Current Status — Week 4: Write-up (2026-05-11)
 
+All data, annotation, and analysis stages are complete. Paper write-up is the remaining task.
+
 | Milestone | State |
 |-----------|-------|
-| Data collection | COMPLETE — 5,925 docs, 16 actors |
-| PDF ingestion (21 docs) | COMPLETE — ingest_pdf.py |
+| Data collection (5,946 docs, 16 actors) | COMPLETE |
+| PDF ingestion (21 docs, ingest_pdf.py) | COMPLETE |
 | Corpus loaded to Snowflake | COMPLETE — AI_FRAMING.PUBLIC.CORPUS |
-| Sentence pool cleaned | COMPLETE — 63,546 sentences (clean_sentences.csv) |
-| Gold set drawn | COMPLETE — prepare_gold_set.py |
-| Kappa Round 1 (κ = 0.36) | FAIL — None/frame boundary added to guidelines |
-| Kappa Round 2 (κ = 0.37) | FAIL — root cause: corpus noise, not guidelines |
-| Corpus cleaning | COMPLETE — clean_corpus.py (5 filters, 69.5% removed) |
+| Sentence pool cleaned | COMPLETE — 63,546 sentences |
+| Kappa Round 1 (κ = 0.36) | FAIL — guidelines revised |
+| Kappa Round 2 (κ = 0.37) | FAIL — corpus noise identified |
+| Corpus cleaning | COMPLETE — clean_corpus.py (208,320 → 63,546 sentences) |
 | Kappa Round 3 (κ = 0.86) | PASS ✓ — 2026-05-09 |
-| LLM labeling | COMPLETE — 63,546 sentences (claude-haiku-4-5-20251001) |
-| validate_llm_labels.py | COMPLETE — macro F1 = 0.633 (precision 0.847, recall 0.534) |
-| build_features.py | COMPLETE — 2,535 docs in analysis_dataset.csv |
-| Regression (Models 1–3, 3 DVs) | COMPLETE — 2026-05-10; all tables in outputs/tables/ |
+| LLM labeling (Haiku, 63,546 sents) | COMPLETE — 2026-05-10 |
+| LLM validation (macro F1 = 0.633) | COMPLETE — outputs/tables/llm_validation.csv |
+| Cross-model robustness (3 alt LLMs) | COMPLETE — Haiku best at F1=0.633 |
+| LLM consistency checks | COMPLETE — 39.5pp None spread; H1 robust |
+| build_features.py (2,535 docs) | COMPLETE — analysis_dataset.csv |
+| Regression (Models 1–3, 3 DVs) | COMPLETE — 2026-05-10; outputs/tables/ |
 | Variance analysis | COMPLETE — H3 directionally supported; outputs/figures/ |
-| Innovation sub-classification | BLOCKED — needs ~$1 Anthropic credits; bonus column only |
-| Paper write-up | IN PROGRESS — Week 4 |
+| Innovation sub-classification | COMPLETE — 12,426 sents, 16 actors (2026-05-11) |
+| Paper write-up | IN PROGRESS |
+
+**Paper write-up checklist (Week 4):**
+- [ ] Introduction + motivation (strategic framing argument, why AI discourse)
+- [ ] Related work (Entman 1993, computational framing studies, AI discourse lit)
+- [ ] Data section (corpus stats, per-actor counts, balance check, structural limitations)
+- [ ] Methodology (annotation protocol, κ=0.86, LLM validation F1=0.633, regression spec)
+- [ ] Results (Model 1–3 tables, variance figure, H1/H2/H3 verdicts)
+- [ ] Discussion (who adapts most, does positioning predict framing consistency?)
+- [ ] Conclusion
+- [ ] All figures finalized
+- [ ] Submitted
+
+**Key constraints for paper write-up (from consistency checks):**
+- Do NOT compare raw framing scores across actors — 39.5pp None rate spread confounds
+- Within-actor context contrasts (M2 interactions) ARE valid
+- Cite only positioning/platform terms from M3 (actor_type and context[T.policy] are multicollinear)
+- Drop Economic Benefit from H2 — LLM recall=0.00 in policy context
+- H2 innovation finding is conservative (true commercial→innovation effect likely larger)
 
 ---
 
