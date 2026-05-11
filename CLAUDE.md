@@ -129,9 +129,6 @@ ai-framing-project/
 │       ├── snowflake_utils.py
 │       └── text_utils.py
 │
-├── notebooks/
-│   └── 04_annotate_corpus.ipynb    ← interactive annotation exploration
-│
 ├── outputs/
 │   ├── figures/
 │   └── tables/
