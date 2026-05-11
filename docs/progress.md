@@ -14,7 +14,7 @@ Regressions and variance analysis complete. LLM consistency checks complete (202
 Cross-model robustness validation complete: GPT-4o-mini, Llama 3.3-70B, Gemini 2.5 Flash
 all evaluated against human gold set — all show conservative precision>recall pattern,
 confirming Haiku annotation choice and task-inherent annotation difficulty.
-Innovation sub-classification still running (~64% done, streaming).
+Innovation sub-classification COMPLETE (2026-05-11) — 12,426 sentences across 16 actors.
 
 **Key paper constraints from consistency checks:**
 - Drop Economic Benefit from H2 — LLM recall=0.00 in policy context
@@ -119,7 +119,7 @@ Last run: 2026-05-08  |  corpus.csv written to data/processed/corpus.csv  |  5,9
 | LLM validation (macro F1 vs gold 100)   | >= 0.80   | 0.633 ✗ (precision 0.847, recall 0.534) | 2026-05-10 |
 | Cross-model robustness validation (3 alt LLMs) | —   | COMPLETE — GPT-4o-mini F1=0.472, Llama 3.3-70B F1=0.415, Gemini 2.5 Flash F1=0.214 (partial) vs Haiku F1=0.633; all conservative (precision > recall); confirms LLM difficulty is task-inherent, Haiku is best annotation choice | 2026-05-11 |
 | LLM consistency checks (differential bias) | —      | COMPLETE — 39.5pp None rate spread; differential innovation recall by context; economic benefit dropped; sensitivity analysis confirms H1 robust | 2026-05-11 |
-| Innovation sub-classification           | —         | IN PROGRESS (~44% at batch 260/595; streaming write active; will finalize when complete) | 2026-05-11 |
+| Innovation sub-classification           | —         | COMPLETE — 12,426 sentences classified across 16 actors; dominant patterns: Nvidia/Huang productivity-heavy (58%/54%), DeepMind/Hassabis scientific-heavy (52%/50%); labeled_documents.csv updated with innovation_subcategory_dominant | 2026-05-11 |
 
 ---
 
@@ -239,10 +239,12 @@ Both — end of week:
         Macro F1 = 0.633 | Precision = 0.847 | Recall = 0.534
         LLM conservative: misses ~47% of positive labels, inflated None rate
         Noted as methodology limitation → outputs/tables/llm_validation.csv
-  - [~] Innovation sub-classification — INTERRUPTED at batch 418/595 (credit exhaustion, 2026-05-10)
-        Script fixed with streaming write + --resume + --finalize flags
-        BLOCKED: need ~$1 Anthropic credits to finish remaining ~155 batches
-        Restart: python src/annotation/subclassify_innovation.py --resume
+  - [x] Innovation sub-classification — COMPLETE (2026-05-11)
+        12,426 sentences labeled across 16 actors (5 sub-categories)
+        Nvidia/Huang: productivity-dominant (58%/54%); DeepMind/Hassabis: scientific (52%/50%)
+        Output: data/annotation/innovation_subclassified.csv
+                outputs/tables/innovation_subclassification.csv
+                data/annotation/labeled_documents.csv (innovation_subcategory_dominant added)
 
 ### Week 3 — Analysis (Days 15–21) — COMPLETE (2026-05-10)
 

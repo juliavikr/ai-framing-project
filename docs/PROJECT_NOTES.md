@@ -240,7 +240,7 @@
   lower than true values but unbiased in direction. Document as methodology limitation.
 - Saved → `outputs/tables/llm_validation.csv`
 
-### Innovation Sub-classification (2026-05-10, INTERRUPTED — awaiting credits)
+### Innovation Sub-classification (COMPLETE 2026-05-11)
 - Script: `src/annotation/subclassify_innovation.py`
 - Input: 11,891 Innovation/Progress sentences from labeled_sentences.csv
 - Sub-categories: health_biotech | climate_energy | scientific | productivity | other_progress
@@ -255,10 +255,16 @@
   - Header written only on first batch; fresh run removes stale OUTPUT_CSV before starting
 - **Restart command:** `python src/annotation/subclassify_innovation.py --resume`
 - **Cost to finish:** ~155 remaining batches × $0.0005/batch ≈ $0.08–0.10 (estimated)
-- **BLOCKED:** needs ~$1 added to Anthropic account
-- Output (once complete):
-  `data/annotation/innovation_subclassified.csv` (sentence-level, streamed)
-  `outputs/tables/innovation_subclassification.csv` (actor-level summary)
+- COMPLETE (2026-05-11): 12,426 sentences labeled, exit code 0
+- Per-actor dominant sub-categories (top patterns):
+  - Nvidia (58% productivity), Jensen Huang (54% productivity) — hardware/compute framing
+  - Google DeepMind (52% scientific), Demis Hassabis (50% scientific) — research framing
+  - Dario Amodei (45% other_progress), Anthropic (51% other_progress)
+  - Satya Nadella (42% other_progress), OpenAI (43% productivity)
+  - EU Commission (38% scientific), US Congress (40% productivity)
+- Output:
+  `data/annotation/innovation_subclassified.csv` (12,426 sentence-level rows)
+  `outputs/tables/innovation_subclassification.csv` (actor-level % summary)
   `data/annotation/labeled_documents.csv` updated with innovation_subcategory_dominant
 
 ---
@@ -935,8 +941,12 @@ significance and direction.
       39.5pp None rate spread; differential innovation recall by context; economic benefit
       dropped; recall-corrected sensitivity analysis confirms H1 robust; M3 multicollinearity
       and M2 public degeneracy documented — see "LLM consistency checks" section above
-- [~] Innovation sub-classification — running (batch ~260/595 as of 2026-05-11; script
-      fixed with streaming write + --resume). Bonus column only; does not affect Models 1–3.
+- [x] Innovation sub-classification — COMPLETE (2026-05-11)
+      12,426 sentences classified; innovation_subcategory_dominant added to labeled_documents.csv
+      Per-actor patterns: Nvidia/Huang productivity-dominant (58%/54%); DeepMind/Hassabis
+      scientific-dominant (52%/50%); Amodei/Anthropic scientific + other_progress.
+      Outputs: data/annotation/innovation_subclassified.csv,
+               outputs/tables/innovation_subclassification.csv
 - [x] `build_features.py` — DONE (2026-05-10); analysis_dataset.csv written (2,535 docs)
 - [x] Regression models (Models 1–3 for all three DVs) — DONE (2026-05-10)
 - [x] variance_analysis.py — DONE (2026-05-10); H3 directionally supported, not formally testable
