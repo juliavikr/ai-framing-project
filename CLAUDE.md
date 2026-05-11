@@ -130,18 +130,15 @@ ai-framing-project/
 │       └── text_utils.py
 │
 ├── notebooks/
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_annotation_validation.ipynb
-│   └── 03_results_visualization.ipynb
+│   └── 04_annotate_corpus.ipynb    ← interactive annotation exploration
 │
 ├── outputs/
 │   ├── figures/
 │   └── tables/
 │
 └── docs/
+    ├── PROJECT_NOTES.md             ← full pipeline documentation: decisions, methods, results
     ├── annotation_guidelines.md
-    ├── progress.md
-    ├── PROJECT_NOTES.md             ← chronological decision log
     └── sources.md                   ← per-actor source documentation
 ```
 
@@ -382,12 +379,10 @@ Kappa target: >= 0.70 before LLM labeling begins
 ---
 
 ## Workflow Rules
-1. Start every session: read docs/progress.md before touching any code
-2. After every scraper run: log actor, context, doc count, date to progress.md
-3. Raw data is sacred: never modify data/raw/ — cleaning only in src/processing/
-4. Kappa gate: compute, log, and confirm >= 0.70 before LLM labeling
-5. Regression outputs: always save to outputs/tables/ — never print only
-6. Balance check: run after each major scraping session
+1. Start every session: read CLAUDE.md and docs/PROJECT_NOTES.md for current state
+2. Raw data is sacred: never modify data/raw/ — cleaning only in src/processing/
+3. Kappa gate: compute, log, and confirm >= 0.70 before LLM labeling
+4. Regression outputs: always save to outputs/tables/ — never print only
 
 ---
 

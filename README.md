@@ -1,6 +1,25 @@
 # AI Strategic Framing Study
 ### Bocconi University — Language Technology 2026
 
+---
+
+## TL;DR
+
+This project tests whether AI industry actors — CEOs, tech companies, and government
+institutions — strategically adapt how they frame AI depending on their audience.
+We scraped 5,925 documents from 16 actors across commercial, policy, and public contexts,
+annotated 63,546 sentences using Claude Haiku (κ = 0.86 inter-annotator agreement,
+macro F1 = 0.633 vs. human gold), and ran OLS regressions on document-level framing proportions.
+
+**Results:** Context is a significant predictor of framing (H1 confirmed, p < 0.001).
+Policy documents contain more risk (+5.5pp) and regulation (+13.6pp) framing than commercial
+documents. The individual-vs-institution variance hypothesis (H3) is directionally supported
+but not formally testable due to the thin public context (4.0% of corpus). The strongest
+single instance of strategic adaptation: Satya Nadella's policy documents are 27.1pp more
+innovation-framed than his commercial ones.
+
+---
+
 ## What this project is about
 
 When Sam Altman testifies before the US Senate, he emphasizes risk and the need for
@@ -91,8 +110,9 @@ Machine CDX API (for sites blocked by Cloudflare or deleted by administrations),
 arXiv, government document archives, podcast transcript sites, and 21 manually
 downloaded PDFs of congressional testimony and regulatory submissions.
 
-All documents are stored in Snowflake (`AI_FRAMING.PUBLIC.CORPUS`) and locally as
-`data/processed/corpus.csv`.
+All documents are loaded into Snowflake (`AI_FRAMING.PUBLIC.CORPUS`). The master
+dataset `corpus.csv` is gitignored (contains scraped content); reproduce it using
+the pipeline steps below.
 
 **Known limitations:**
 - Public context at only 4.0% (target: ≥15%) — YouTube captions disabled for all
@@ -181,19 +201,19 @@ ai-framing-project/
 ├── CLAUDE.md                   ← AI assistant context (read first each session)
 ├── README.md                   ← this file
 ├── docs/
-│   ├── annotation_guidelines.md
-│   ├── progress.md             ← corpus tracker and week-by-week checklist
-│   ├── PROJECT_NOTES.md        ← chronological log of decisions and problems
-│   └── sources.md              ← per-actor source documentation
+│   ├── PROJECT_NOTES.md        ← full pipeline documentation: decisions, methods, results
+│   ├── annotation_guidelines.md ← frame definitions, examples, edge-case rules
+│   └── sources.md              ← per-actor source list with URLs, methods, and status
 ├── data/
 │   ├── raw/                    ← scraped files by actor (never modified)
 │   ├── processed/
-│   │   └── corpus.csv          ← master dataset (5,925 docs)
+│   │   └── corpus.csv          ← master dataset (gitignored; reproduce via pipeline)
 │   └── annotation/
 │       ├── clean_sentences.csv      ← 63,546 filtered sentences
 │       ├── gold_set_*.csv           ← stratified annotator samples
+│       ├── kappa_overlap_person_*_v3.xlsx  ← Round 3 annotation overlap files
 │       ├── labeled_sentences.csv    ← 63,546 LLM-labeled sentences
-│       └── labeled_documents.csv   ← doc-level framing scores
+│       └── labeled_documents.csv   ← doc-level framing scores (regression input)
 ├── src/
 │   ├── scraping/               ← scrapers for each source type + PDF ingest
 │   ├── processing/             ← dedup, corpus builder, sentence cleaner
@@ -203,7 +223,7 @@ ai-framing-project/
 │   └── utils/                  ← Snowflake connector, text utilities
 ├── outputs/
 │   ├── figures/                ← all plots (300 dpi PNG)
-│   └── tables/                 ← regression output CSVs
+│   └── tables/                 ← regression output CSVs and validation results
 └── requirements.txt
 ```
 
@@ -211,32 +231,36 @@ ai-framing-project/
 
 ## Reproducing the pipeline
 
+> **Note:** `corpus.csv` is gitignored. Steps 1–2 require Snowflake credentials
+> (add to `.env`). Steps 3 onward can run from `data/annotation/` files checked
+> into the repo.
+
 ```bash
 pip install -r requirements.txt
 cp .env.template .env            # add Snowflake + Anthropic credentials
 
-# Data collection
+# 1. Data collection
 python src/scraping/scrape_individuals.py --actor "Sam Altman" --context commercial
 python src/scraping/scrape_companies.py --actor openai --context commercial
 python src/scraping/scrape_policy.py --actor "EU Commission"
-python src/scraping/ingest_pdf.py
+python src/scraping/ingest_pdf.py           # 21 manually downloaded PDFs
 
-# Build corpus
+# 2. Build corpus
 python src/processing/clean_and_dedupe.py
 python src/processing/build_corpus.py
 python src/utils/snowflake_utils.py --load data/processed/corpus.csv
 
-# Annotation prep
-python src/processing/clean_corpus.py          # build clean sentence pool + draw v3 overlap
+# 3. Annotation prep
+python src/processing/clean_corpus.py          # 208,320 → 63,546 sentences + v3 overlap draw
 python src/annotation/compute_kappa.py \
   --a data/annotation/kappa_overlap_person_a_v3.xlsx \
   --b data/annotation/kappa_overlap_person_b_v3.xlsx
 
-# LLM labeling (after κ ≥ 0.70)
+# 4. LLM labeling (after κ ≥ 0.70)
 python src/annotation/label_with_llm.py --input data/processed/corpus.csv
 python src/annotation/validate_llm_labels.py --gold data/annotation/gold_set_merged.csv
 
-# Analysis
+# 5. Analysis
 python src/features/build_features.py
 python src/models/regression.py --dv risk_score
 python src/models/regression.py --dv innovation_score

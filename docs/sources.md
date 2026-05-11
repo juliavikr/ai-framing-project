@@ -11,7 +11,7 @@ to, approximate raw doc count (before corpus-level dedup), and access status.
 - **blocked** — attempted but access denied (403 / JS-rendered / paywalled)
 
 Raw counts reflect files in `data/raw/`. Corpus counts after dedup are lower (see
-`docs/progress.md` balance report for post-dedup totals).
+`docs/PROJECT_NOTES.md` §2.3 for post-dedup balance summary).
 
 ---
 
@@ -229,8 +229,8 @@ collection bridged this gap (1–2 docs per individual). Satya Nadella's policy 
 derives from Microsoft's On the Issues blog, which was accessible.
 
 **24 actor/context pairs below 50-doc minimum**
-See `docs/progress.md` balance report. Most failures are public or policy contexts.
-Policymakers are exempt from the commercial-context minimum.
+See `docs/PROJECT_NOTES.md` §2.3 for balance summary. Most failures are public or policy
+contexts. Policymakers are exempt from the commercial-context minimum.
 
 **Meta AI policy (0 corpus docs)**
 108 raw files collected from about.fb.com/news under "policy" context but all were deduped
