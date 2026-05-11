@@ -267,14 +267,3 @@ python src/models/regression.py --dv innovation_score
 python src/models/regression.py --dv regulation_score
 python src/models/variance_analysis.py
 ```
-
----
-
-## Team
-2 students — Bocconi University, Language Technology 2026
-
-## Status
-- [x] Week 1 — Data collection (5,925 docs, 16 actors)
-- [x] Week 2 — Annotation (κ = 0.86; LLM labeling complete; validation F1 = 0.633)
-- [x] Week 3 — Analysis (Models 1–3 complete; H1 ✓, H2 partial ✓, H3 directional ✓)
-- [~] Week 4 — Write-up (IN PROGRESS)
