@@ -5,6 +5,22 @@
 
 ## 1. Research Overview
 
+**What is framing?** Framing refers to the selective emphasis of certain aspects of a
+topic over others. When an actor frames AI as an engine of economic growth, they
+highlight opportunity and downplay risk; when they frame it as a governance challenge,
+they highlight oversight and downplay capability. The same underlying technology is
+presented differently depending on what the communicator wants the audience to perceive
+and prioritize. This project follows Entman (1993): frames are patterns of selection and
+salience that promote particular interpretations.
+
+**Why does context matter?** The central claim is that the same actor deliberately
+shifts their framing depending on audience. A CEO speaking at a product launch (commercial
+context) has every incentive to emphasize innovation and suppress risk. The same CEO
+testifying before Congress (policy context) faces a regulatory audience and may
+strategically foreground governance or, conversely, push back with an innovation
+narrative to resist regulation. If framing is genuinely strategic, we should observe
+systematic differences across contexts that cannot be explained by random variation.
+
 **Research question:** To what extent do actors adapt their framing of AI across
 communication contexts (commercial, policy, public), controlling for time, platform,
 and actor type?
@@ -14,6 +30,7 @@ and actor type?
 - H2: Commercial contexts increase innovation/economic framing; policy contexts increase
   risk/regulation framing
 - H3: Individual actors show greater cross-context framing variance than institutions
+  (individuals have more personal agency to adapt; companies have brand consistency pressures)
 
 **Method in brief:** Scraped ~6,000 documents from 16 actors (individuals, companies,
 policymakers). Sentence-level annotation via Claude Haiku (63,546 sentences, 5 frames).
@@ -24,6 +41,14 @@ Document-level framing scores as DVs in OLS regression (Models 1–3, three DVs 
 ## 2. Data Collection
 
 ### 2.1 Corpus design and actor selection
+
+**Actor selection rationale:** Actors were selected to represent the full spectrum of
+AI discourse: leading AI companies and their CEOs (who shape commercial and public
+narrative), and major regulatory bodies (who shape policy narrative). The individual/
+company pairing is deliberate — each individual CEO is paired with their own company
+(e.g., Altman/OpenAI, Amodei/Anthropic) so that H3 can be tested by comparing how
+much an individual adapts versus the institutional voice of their own organization.
+The four policymakers cover the three most active regulatory jurisdictions (US, EU, UK).
 
 **16 actors across three types:**
 
@@ -38,16 +63,27 @@ EDGAR earnings, Rev.com transcripts). xAI blocked by Cloudflare; no accessible p
 corpus. Replaced by Satya Nadella — full 3-context coverage, clean individual↔company
 pair with Microsoft. Raw files archived at `data/raw/_excluded/elon_musk/`.
 
-**Three communication contexts:**
+**Three communication contexts** (defined strictly to avoid ambiguity):
 - Commercial: company blogs, product launches, earnings calls, press releases, research publications
 - Policy: congressional testimony, regulatory submissions, government strategy documents
 - Public: media interviews, podcast appearances, public keynotes, op-eds
 
-**Actor positioning** (strategic identity assigned at intake):
-- Capability: Altman, Nadella, Zuckerberg + their companies
-- Safety: Amodei, Hassabis, Anthropic, Google DeepMind
-- Infrastructure: Huang, Nvidia
-- Regulator: EU Commission, US Congress, UK DSIT, White House OSTP
+These three contexts represent three distinct audiences with different expectations:
+investors/customers (commercial), legislators/regulators (policy), and the general
+public (public). If actors are strategic communicators, we expect their framing to
+vary systematically across these audiences.
+
+**Actor positioning** — a categorical control variable for the actor's known public
+strategic identity, assigned at intake based on publicly stated priorities:
+- Capability: Altman, Nadella, Zuckerberg + their companies (AI as product/competitive edge)
+- Safety: Amodei, Hassabis, Anthropic, Google DeepMind (AI risk and responsible development)
+- Infrastructure: Huang, Nvidia (AI as compute/hardware layer)
+- Regulator: EU Commission, US Congress, UK DSIT, White House OSTP (oversight mandate)
+
+Positioning is included in Model 3 to test whether an actor's institutional identity
+predicts their framing content independently of context — i.e., does a safety-positioned
+actor consistently use more risk language regardless of whether they are writing a blog
+post or testifying before Congress?
 
 ### 2.2 Collection methods and sources
 
@@ -58,8 +94,10 @@ URL-based deduplication, 1-second polite delay. Key workarounds:
 - **OpenAI and White House OSTP** — both blocked or deleted from live web. Recovered
   via Wayback Machine CDX API (academic reproducibility; no authentication required).
 - **Company research papers** — arXiv author-name queries added ~1,306 research papers
-  for 6 companies. Classified as commercial context (company research output). Side
-  effect: inflates company corpus share to 52.5% — acknowledged limitation.
+  for 6 companies. Classified as commercial context because research papers are official
+  company output published under the company's name to demonstrate capability and attract
+  talent/investment — the same function as a product blog post. Side effect: inflates
+  company corpus share to 52.5% — acknowledged limitation.
 - **Sam Altman blog**: 121 posts (source exhausted)
 - **Dario Amodei**: 331 commercial via Anthropic sitemap (JS listing bypassed by
   fetching sitemap.xml directly)
@@ -73,7 +111,9 @@ EU/US/UK regulatory documents, and public essays. Added 21 docs to the corpus.
 **Data pipeline:**
 - `clean_and_dedupe.py`: deduplication key = (actor, date, first 200 chars of text)
 - `build_corpus.py`: schema validation, word count, post_chatgpt flag (1 if date ≥
-  2022-11-30), UUID4 doc_id
+  2022-11-30, the ChatGPT public launch date — used as a structural break to control
+  for the possibility that AI framing changed across the entire corpus after ChatGPT
+  made AI mainstream), UUID4 doc_id
 - Loaded to Snowflake: `AI_FRAMING.PUBLIC.CORPUS` (5,925 rows, 8.8s)
 
 ### 2.3 Final corpus
@@ -105,6 +145,26 @@ EU/US/UK regulatory documents, and public essays. Added 21 docs to the corpus.
 
 ### 3.1 Annotation scheme
 
+**Why these 5 frames?** The frames were chosen to cover the dominant dimensions of AI
+public discourse identified in prior computational framing studies and AI policy
+literature: the opportunity narrative (Innovation, Economic Benefit), the risk narrative
+(Risk/Harm, Existential/AGI), and the governance response (Regulation/Governance). This
+5-frame scheme was developed iteratively — an 8-frame pilot collapsed several overlapping
+categories, and a 3-frame version was too coarse to capture the regulation/risk distinction
+that is central to H2. The 5-frame scheme achieved κ=0.86, validating that annotators
+can reliably distinguish these categories.
+
+**Why multi-label (not single best label)?** A single sentence can make multiple
+simultaneous claims — e.g., "AI will create jobs [Economic Benefit] but requires
+oversight [Regulation/Governance]." Forcing a single label would discard real signal.
+Binary labels per frame preserve the co-occurrence structure. The None label captures
+sentences that carry no discernible frame claim.
+
+**Why require EXPLICIT statements?** Framing analysis requires observable textual
+evidence. If annotators infer a frame from subtext or implication, two annotators will
+infer differently — producing low Kappa. The "explicit only" rule anchors labels to
+surface-level linguistic evidence, making the task tractable and reproducible.
+
 Five binary labels per sentence (one or more labels, or None):
 
 | Label | Definition |
@@ -120,9 +180,18 @@ Full definitions in `docs/annotation_guidelines.md`.
 
 ### 3.2 Gold set and inter-annotator agreement
 
+**What is Cohen's Kappa (κ)?** Kappa measures inter-annotator agreement corrected for
+chance. κ=0 means agreement no better than random; κ=1 means perfect agreement.
+Landis & Koch (1977) thresholds: κ<0.40 = poor, 0.40–0.60 = moderate, 0.61–0.80 =
+substantial, >0.80 = almost perfect. The field standard for LLM annotation pipelines
+is κ≥0.70 (substantial) before trusting the LLM to scale the task — below this,
+human disagreement is too large to treat any single labeler (human or LLM) as ground truth.
+
 **Gold set design:** 600-sentence stratified sample (300 per annotator, non-overlapping
-for labeling, 100-sentence overlap for Kappa). Stratification: 100 sentences per
-context, ≥5 actors, 20% short sentences, pre/post-ChatGPT mix.
+for labeling, 100-sentence overlap for Kappa). Stratification across contexts (100 per
+context) ensures Kappa is computed on a balanced sample rather than one dominated by the
+commercial context (61% of corpus). Including ≥5 actors and a mix of pre/post-ChatGPT
+sentences ensures the overlap set is representative of the full corpus's diversity.
 
 **Round 1 — κ = 0.36, FAIL**
 28 disagreements; 24/28 were None vs. frame. Root cause: None/frame boundary
@@ -202,12 +271,31 @@ human gold set (Person B v3 annotations).
 | Existential/AGI | 0.667 | 0.400 | 0.500 | 0.960 |
 | **MACRO AVG** | **0.847** | **0.534** | **0.633** | **0.915** |
 
+**What do precision, recall, and F1 mean here?**
+- **Precision** = of all sentences Haiku labeled as frame X, what fraction were actually
+  frame X in human labels? High precision means few false positives (when Haiku fires,
+  it is usually right).
+- **Recall** = of all sentences humans labeled as frame X, what fraction did Haiku also
+  label as X? High recall means few false negatives (Haiku catches most of the true instances).
+- **F1** = harmonic mean of precision and recall; penalizes models that are strong on
+  one dimension but weak on the other. The 0.80 target means we want both precision
+  and recall to be reliably high.
+
 **Diagnosis:** High precision (when Haiku assigns a frame, it is almost always correct)
 but low recall (it defaults to None too often — ~47% of true positive labels missed).
 This inflates the None rate to 58.1% vs ~33% in human annotations. Framing scores
 are systematically lower than true values but **unbiased in direction** — positive
-findings are conservative, not inflated. The F1=0.633 is below the 0.80 target and
-is documented as a methodology limitation.
+findings are conservative, not inflated.
+
+**Why conservative is safer than inflated for academic claims:** If Haiku over-fires
+(high recall, low precision) it would generate false positives — inventing framing
+that isn't there — and inflate any observed context differences. That would make the
+study's findings stronger than they really are: a type I error risk. Haiku under-fires
+(high precision, low recall) — it misses real framing but rarely fabricates it. The
+observed effect sizes are therefore underestimates; the true effects are likely larger.
+Under-claiming is methodologically safer for an academic paper than over-claiming.
+
+The F1=0.633 is below the 0.80 target and is documented as a methodology limitation.
 
 Output: `outputs/tables/llm_validation.csv`
 
@@ -263,9 +351,19 @@ Outputs: `outputs/tables/llm_validation_gpt-4o-mini.csv` ·
 
 ### 3.6 Differential bias analysis (LLM consistency checks)
 
-Uniform recall suppression is methodologically acceptable (direction preserved);
-differential suppression by actor or context confounds real framing differences with
-annotation sensitivity. Four targeted checks were run.
+**The core question here:** We know Haiku misses ~47% of positive labels overall. The
+key assumption for valid regression is that this miss rate is approximately uniform —
+i.e., Haiku is equally likely to miss a Risk/Harm sentence whether it comes from OpenAI
+or from the EU Commission, and whether it appears in a commercial or a policy document.
+If that assumption holds, regression coefficients capture real framing differences
+(though scaled down by the suppression factor). If the miss rate varies systematically
+by actor or context, then observed differences in framing scores could partly reflect
+where Haiku is more vs. less sensitive — not where actors actually frame differently.
+
+Uniform suppression: direction preserved, magnitude underestimated — acceptable.
+Differential suppression: observed differences partly spurious — not acceptable.
+
+Four targeted checks were run to test this assumption.
 
 **Check 1 — Recall by context**
 
@@ -405,12 +503,29 @@ framing_score_F_d = (sentences labeled F in d) / (total sentences in d)
 ```
 
 This is a 0–1 proportion: a 20-sentence document with 5 Innovation labels gets
-innovation_score = 0.25. Sentence-level labels are too sparse for actor comparisons
-(58% are None); aggregation gives a continuous, interpretable dependent variable.
+innovation_score = 0.25.
+
+**Why proportions rather than raw counts?** Documents vary enormously in length (a
+blog post is 500 words; a congressional testimony is 10,000 words). A long document
+will naturally contain more labeled sentences simply because it has more sentences —
+not because the actor frames more intensely. Normalizing by document length makes
+framing scores comparable across documents of different lengths. A proportion measures
+framing density, which is what we care about.
+
+**Why aggregate to document level rather than use sentence-level labels directly?**
+58% of sentences are None. Working at sentence level would mean trying to model a
+very sparse, noisy binary variable — most of the variance is just random within-document
+variation. Document-level proportions smooth over this noise and give a stable signal
+per observation. They also match the unit of analysis in the corpus (one document = one
+actor, one context, one date).
 
 **Filter:** Documents with fewer than 5 sentences excluded (3,411 removed from 5,946).
-Retains 2,535 documents for regression — eliminates boilerplate press releases,
-one-paragraph blog posts, and procedural texts that generate unreliable proportions.
+The n≥5 threshold is the minimum for a proportion to carry meaningful signal — a
+2-sentence document where 1 sentence has a frame gives a score of 0.50, which is
+numerically the same as a 100-sentence document with 50 labeled sentences, but reflects
+much more uncertainty. Five sentences was chosen as a conservative floor that eliminates
+single-paragraph boilerplate while retaining short but substantive documents.
+Retains 2,535 documents for regression.
 
 **Descriptive means by context** (before regression controls):
 
@@ -454,7 +569,35 @@ specific signal rather than a corpus-wide pattern suitable for comparative regre
 All three have sufficient variance at document level and non-zero LLM recall in every
 key context. They map directly onto the H1/H2 theoretical contrast.
 
-### 4.3 Interpreting regression coefficients
+### 4.3 Regression approach
+
+**Why OLS (Ordinary Least Squares)?** OLS estimates the linear relationship between
+predictors and the DV by minimizing the sum of squared residuals. For a 0–1 proportion
+DV, the natural alternative is beta regression (designed for bounded continuous outcomes)
+or logistic regression (for binary outcomes). We use OLS because: (1) framing scores
+are averages of many binary sentence labels — by the central limit theorem, document-level
+proportions are approximately normally distributed, especially for Innovation (18.7%
+base rate) and Regulation (11.5%); (2) OLS coefficients are directly interpretable as
+percentage-point changes; (3) OLS is standard in computational social science framing
+studies, making our results comparable to prior work. The linear approximation is valid
+given that most framing scores are well away from 0 or 1 (the boundary region where
+OLS breaks down).
+
+**Why three models rather than one?** Each model answers a different question:
+- M1 (context + time only): Is there a context effect at all? Simple, clean, interpretable.
+- M2 (actor + context + interaction): Do specific actors shift their framing? Requires
+  restricting to well-covered actor×context pairs but captures strategic adaptation directly.
+- M3 (full controls): After accounting for everything structural, what still predicts
+  framing? Highest explanatory power but requires careful interpretation due to multicollinearity.
+
+The three-model progression also provides robustness: if the context effects found in M1
+disappear in M3, they were confounded by structural factors. The fact that they survive
+(and in some cases strengthen) across models increases confidence in the findings.
+
+**All three models are run separately for each of the three DVs** (innovation_score,
+risk_score, regulation_score) — 9 regressions in total.
+
+### 4.4 Interpreting coefficients and model fit
 
 In OLS on a 0–1 proportion DV, **β = expected change in framing proportion per unit
 change in the predictor**, holding all others constant.
@@ -478,7 +621,7 @@ R²>0.15 is strong. Regulation reaches R²=0.221 in M3 — the most structurally
 frame. Innovation reaches only R²=0.014 in M1, reflecting genuine actor-level heterogeneity
 that M2 better captures (R²=0.082).
 
-### 4.4 Model 1 — Does context predict framing? (H1)
+### 4.5 Model 1 — Does context predict framing? (H1)
 
 **Specification:**
 ```
@@ -516,7 +659,7 @@ Simple enough to communicate the core H1 test without multicollinearity concerns
 - Low R² (innovation 0.014) means context alone leaves most framing variance unexplained;
   actor-level heterogeneity requires Model 2.
 
-### 4.5 Model 2 — Strategic adaptation (H2/H3)
+### 4.6 Model 2 — Strategic adaptation (H2/H3)
 
 **Specification:**
 ```
@@ -568,7 +711,7 @@ commercial/policy contrasts are reported.
 2 companies). Results cannot be generalized to policymakers or the full 16-actor
 corpus. Disclose explicitly in the paper methodology section.
 
-### 4.6 Model 3 — Full structural controls
+### 4.7 Model 3 — Full structural controls
 
 **Specification:**
 ```
@@ -631,14 +774,20 @@ Do not cite actor_type or context[T.policy] from M3 as primary findings.
 - Post-ChatGPT intensification survives full controls for all three frames —
   November 2022 marked a genuine discursive shift.
 
-### 4.7 Variance analysis — H3
+### 4.8 Variance analysis — H3
 
 **Purpose:** Test whether individual actors adapt more across contexts than companies.
 H3 predicts individual σ > company σ.
 
-**Method:** For each qualifying actor, compute the standard deviation of mean framing
-scores across their contexts. Standard deviation generalizes to actors in 3+ contexts
-and is less sensitive to a single outlier than range.
+**Method:** For each qualifying actor, first compute the mean framing score for each
+of that actor's contexts (e.g., Nadella's mean innovation_score across all his commercial
+documents, and separately across all his policy documents). Then take the standard
+deviation of those context-level means. This SD captures how much the actor's framing
+shifts across the communication contexts where they appear.
+
+Standard deviation (rather than range = max − min) is used because it generalizes
+cleanly to actors with 3 contexts without over-weighting a single extreme context, and
+is additive across DVs for comparison.
 
 **Qualification criterion:** ≥50 docs in ≥2 distinct contexts. Only 5 of 16 actors
 qualify — the 50-doc threshold excludes nearly all individuals (structural gap in
