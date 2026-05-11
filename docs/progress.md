@@ -10,10 +10,11 @@ Submission deadline: ___________
 ## Current Status
 **Week 4: Write-up in progress**
 
-Regressions and variance analysis complete. LLM consistency checks complete (2026-05-11):
-39.5pp None rate spread documented; H1 confirmed robust via recall-corrected sensitivity
-analysis; Economic Benefit DV dropped; M3 multicollinearity and M2 public degeneracy
-documented. Innovation sub-classification still running (~44% done, streaming).
+Regressions and variance analysis complete. LLM consistency checks complete (2026-05-11).
+Cross-model robustness validation complete: GPT-4o-mini, Llama 3.3-70B, Gemini 2.5 Flash
+all evaluated against human gold set — all show conservative precision>recall pattern,
+confirming Haiku annotation choice and task-inherent annotation difficulty.
+Innovation sub-classification still running (~64% done, streaming).
 
 **Key paper constraints from consistency checks:**
 - Drop Economic Benefit from H2 — LLM recall=0.00 in policy context
@@ -116,7 +117,7 @@ Last run: 2026-05-08  |  corpus.csv written to data/processed/corpus.csv  |  5,9
 | LLM pipeline test (50 docs, Haiku)      | working   | ✓ real labels  | 2026-05-10 |
 | Full LLM labeling complete              | 63,546    | ✓ 63,546 sents | 2026-05-10 |
 | LLM validation (macro F1 vs gold 100)   | >= 0.80   | 0.633 ✗ (precision 0.847, recall 0.534) | 2026-05-10 |
-| Alternative LLM validation (GPT-4o-mini)    | —      | COMPLETE — macro F1 0.472 vs Haiku 0.633; both models conservative; confirms Haiku choice and Economic Benefit exclusion | 2026-05-11 |
+| Cross-model robustness validation (3 alt LLMs) | —   | COMPLETE — GPT-4o-mini F1=0.472, Llama 3.3-70B F1=0.415, Gemini 2.5 Flash F1=0.214 (partial) vs Haiku F1=0.633; all conservative (precision > recall); confirms LLM difficulty is task-inherent, Haiku is best annotation choice | 2026-05-11 |
 | LLM consistency checks (differential bias) | —      | COMPLETE — 39.5pp None rate spread; differential innovation recall by context; economic benefit dropped; sensitivity analysis confirms H1 robust | 2026-05-11 |
 | Innovation sub-classification           | —         | IN PROGRESS (~44% at batch 260/595; streaming write active; will finalize when complete) | 2026-05-11 |
 

@@ -1,0 +1,7 @@
+label,precision,recall,f1,accuracy,human_positive,llm_positive,n
+Innovation/Progress,0.3103,0.75,0.439,0.77,12,29,100
+Economic Benefit,0.3636,0.4444,0.4,0.88,9,11,100
+Risk/Harm,0.5,0.6,0.5455,0.95,5,6,100
+Regulation/Governance,0.25,0.5,0.3333,0.96,2,4,100
+Existential/AGI,0.0,0.0,0.0,1.0,0,0,100
+None,0.8929,0.6849,0.7752,0.71,73,56,100

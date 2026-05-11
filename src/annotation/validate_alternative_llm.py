@@ -4,11 +4,17 @@ to Haiku's labels. Tests robustness: if both models agree on direction and magni
 of precision/recall trade-off, conservative recall is a general LLM property rather
 than a Haiku-specific artefact.
 
+Supported providers (auto-detected from --model prefix):
+  openai  → gpt-4o-mini, gpt-4o, etc.          needs OPENAI_API_KEY
+  gemini  → gemini-2.0-flash, gemini-1.5-flash  needs GEMINI_API_KEY
+  groq    → llama-3.3-70b-versatile, etc.       needs GROQ_API_KEY
+
 Usage:
     python src/annotation/validate_alternative_llm.py --model gpt-4o-mini
+    python src/annotation/validate_alternative_llm.py --model gemini-2.0-flash
+    python src/annotation/validate_alternative_llm.py --model llama-3.3-70b-versatile
     python src/annotation/validate_alternative_llm.py --model gpt-4o-mini --limit 20
 
-Requires OPENAI_API_KEY in .env
 Output: outputs/tables/llm_validation_<model>.csv
         Prints side-by-side comparison with Haiku baseline.
 """
@@ -24,7 +30,6 @@ from pathlib import Path
 import openpyxl
 import pandas as pd
 from dotenv import load_dotenv
-from openai import OpenAI
 from sklearn.metrics import f1_score, precision_score, recall_score
 
 load_dotenv()
@@ -32,8 +37,8 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.config import DATA_ANNOTATION, OUTPUTS_TABLES
 
-GOLD_PATH    = DATA_ANNOTATION / "kappa_overlap_person_a.xlsx"
-HAIKU_CSV    = OUTPUTS_TABLES  / "llm_validation.csv"
+GOLD_PATH = DATA_ANNOTATION / "kappa_overlap_person_a.xlsx"
+HAIKU_CSV = OUTPUTS_TABLES  / "llm_validation.csv"
 
 FRAMES = [
     "Innovation/Progress",
@@ -85,6 +90,134 @@ INTER_CALL_DELAY = 0.5
 MAX_RETRIES      = 3
 
 
+# ── Provider detection ─────────────────────────────────────────────────────────
+
+def detect_provider(model: str) -> str:
+    m = model.lower()
+    if m.startswith("gpt") or m.startswith("o1") or m.startswith("o3"):
+        return "openai"
+    if m.startswith("gemini"):
+        return "gemini"
+    if "llama" in m or "mixtral" in m or "gemma" in m or "qwen" in m:
+        return "groq"
+    raise ValueError(f"Cannot detect provider for model '{model}'. "
+                     f"Pass --provider openai|gemini|groq explicitly.")
+
+
+def build_client(provider: str, model: str):
+    if provider == "openai":
+        from openai import OpenAI
+        key = os.getenv("OPENAI_API_KEY")
+        if not key:
+            print("Error: OPENAI_API_KEY not set in .env"); sys.exit(1)
+        return OpenAI(api_key=key)
+
+    if provider == "gemini":
+        from google import genai
+        key = os.getenv("GEMINI_API_KEY")
+        if not key:
+            print("Error: GEMINI_API_KEY not set in .env"); sys.exit(1)
+        return genai.Client(api_key=key)
+
+    if provider == "groq":
+        from groq import Groq
+        key = os.getenv("GROQ_API_KEY")
+        if not key:
+            print("Error: GROQ_API_KEY not set in .env"); sys.exit(1)
+        return Groq(api_key=key)
+
+    raise ValueError(f"Unknown provider: {provider}")
+
+
+# ── API calls ──────────────────────────────────────────────────────────────────
+
+def call_openai(client, model: str, batch: list) -> str:
+    user_msg = json.dumps(batch, ensure_ascii=False)
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user",   "content": user_msg},
+        ],
+        temperature=0,
+        max_tokens=800,
+    )
+    return resp.choices[0].message.content.strip()
+
+
+def call_gemini(client, model: str, batch: list) -> str:
+    from google.genai import types
+    user_msg = json.dumps(batch, ensure_ascii=False)
+    # API requires full model path (models/...) if not already prefixed
+    full_model = model if model.startswith("models/") else f"models/{model}"
+    resp = client.models.generate_content(
+        model=full_model,
+        contents=user_msg,
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            temperature=0,
+            max_output_tokens=800,
+        ),
+    )
+    return resp.text.strip()
+
+
+def call_groq(client, model: str, batch: list) -> str:
+    user_msg = json.dumps(batch, ensure_ascii=False)
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user",   "content": user_msg},
+        ],
+        temperature=0,
+        max_tokens=800,
+    )
+    return resp.choices[0].message.content.strip()
+
+
+def call_model(client, provider: str, model: str, batch: list) -> str:
+    if provider == "openai":
+        return call_openai(client, model, batch)
+    if provider == "gemini":
+        return call_gemini(client, model, batch)
+    if provider == "groq":
+        return call_groq(client, model, batch)
+
+
+# ── Response parsing ───────────────────────────────────────────────────────────
+
+def parse_response(raw: str, expected_ids: list) -> dict:
+    clean = re.sub(r"^```[a-z]*\n?", "", raw.strip(), flags=re.MULTILINE)
+    clean = re.sub(r"\n?```$", "", clean.strip())
+    data  = json.loads(clean)
+    result = {}
+    for item in data:
+        sid    = str(item.get("id", ""))
+        labels = item.get("labels", ["None"])
+        result[sid] = labels
+    for sid in expected_ids:
+        if sid not in result:
+            result[sid] = ["None"]
+    return result
+
+
+def label_batch(client, provider: str, model: str, batch: list) -> dict:
+    expected_ids = [b["id"] for b in batch]
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            raw = call_model(client, provider, model, batch)
+            return parse_response(raw, expected_ids)
+        except Exception as exc:
+            if attempt < MAX_RETRIES:
+                time.sleep(3 * attempt)
+            else:
+                print(f"  Batch failed after {MAX_RETRIES} attempts: {exc}")
+                return {sid: ["None"] for sid in expected_ids}
+
+
+# ── Gold set loading ───────────────────────────────────────────────────────────
+
 def _to_binary(v) -> int:
     if v is None:
         return 0
@@ -113,48 +246,7 @@ def load_gold() -> pd.DataFrame:
     return df[keep]
 
 
-def call_openai(client: OpenAI, model: str, batch: list) -> str:
-    user_msg = json.dumps(batch, ensure_ascii=False)
-    resp = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user",   "content": user_msg},
-        ],
-        temperature=0,
-        max_tokens=800,
-    )
-    return resp.choices[0].message.content.strip()
-
-
-def parse_response(raw: str, expected_ids: list) -> dict:
-    clean = re.sub(r"^```[a-z]*\n?", "", raw.strip(), flags=re.MULTILINE)
-    clean = re.sub(r"\n?```$", "", clean.strip())
-    data  = json.loads(clean)
-    result = {}
-    for item in data:
-        sid    = str(item.get("id", ""))
-        labels = item.get("labels", ["None"])
-        result[sid] = labels
-    for sid in expected_ids:
-        if sid not in result:
-            result[sid] = ["None"]
-    return result
-
-
-def label_batch(client, model, batch, attempt=1):
-    expected_ids = [b["id"] for b in batch]
-    for attempt in range(1, MAX_RETRIES + 1):
-        try:
-            raw = call_openai(client, model, batch)
-            return parse_response(raw, expected_ids)
-        except Exception as exc:
-            if attempt < MAX_RETRIES:
-                time.sleep(3 * attempt)
-            else:
-                print(f"  Batch failed after {MAX_RETRIES} attempts: {exc}")
-                return {sid: ["None"] for sid in expected_ids}
-
+# ── Metrics ────────────────────────────────────────────────────────────────────
 
 def compute_metrics(gold: pd.DataFrame, predictions: dict) -> list:
     rows = []
@@ -221,29 +313,28 @@ def print_comparison(alt_rows: list, model: str):
           f"{h_macro['recall']:>8.3f} {a_macro['recall']:>6.3f}  "
           f"{h_macro['f1']:>9.3f} {a_macro['f1']:>7.3f}")
 
-    # Key robustness claim
     both_conservative = a_macro["precision"] > a_macro["recall"]
     print(f"\nRobustness check: {model} also conservative (precision > recall)? "
           f"{'YES ✓' if both_conservative else 'NO ✗'}")
 
 
+# ── Main ───────────────────────────────────────────────────────────────────────
+
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--model",  default="gpt-4o-mini", help="OpenAI model ID")
-    p.add_argument("--limit",  type=int, default=None, help="Use only first N gold sentences (test)")
+    p.add_argument("--model",    required=True, help="Model ID (e.g. gpt-4o-mini, gemini-2.0-flash, llama-3.3-70b-versatile)")
+    p.add_argument("--provider", default=None,  help="openai|gemini|groq (auto-detected if omitted)")
+    p.add_argument("--limit",    type=int, default=None, help="Use only first N gold sentences (test)")
     return p.parse_args()
 
 
 def main():
-    args  = parse_args()
-    model = args.model
+    args     = parse_args()
+    model    = args.model
+    provider = args.provider or detect_provider(model)
 
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("Error: OPENAI_API_KEY not set in .env")
-        sys.exit(1)
-
-    client = OpenAI(api_key=api_key)
+    print(f"Provider: {provider}  |  Model: {model}")
+    client = build_client(provider, model)
 
     print(f"Loading gold set ({GOLD_PATH.name}) …")
     gold = load_gold()
@@ -257,7 +348,7 @@ def main():
         chunk = gold.iloc[i : i + BATCH_SIZE]
         batch = [{"id": str(r["sentence_id"]), "text": str(r["sentence_text"])}
                  for _, r in chunk.iterrows()]
-        result = label_batch(client, model, batch)
+        result = label_batch(client, provider, model, batch)
         predictions.update(result)
         done = min(i + BATCH_SIZE, len(gold))
         print(f"  {done}/{len(gold)} sentences labeled …", flush=True)
@@ -265,10 +356,10 @@ def main():
 
     print(f"\n── {model} results vs human gold ──")
     rows = compute_metrics(gold, predictions)
-
     print_comparison(rows, model)
 
-    out_path = OUTPUTS_TABLES / f"llm_validation_{model.replace('/', '-')}.csv"
+    safe_name = model.replace("/", "-").replace(":", "-")
+    out_path  = OUTPUTS_TABLES / f"llm_validation_{safe_name}.csv"
     OUTPUTS_TABLES.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_csv(out_path, index=False)
     print(f"\nSaved → {out_path}")
