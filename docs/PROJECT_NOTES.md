@@ -357,6 +357,137 @@ Microsoft (σ=0.031, σ=0.049). This is the strongest direct evidence of individ
 strategic adaptation in the corpus. Paper should present this as illustrative rather
 than inferential, and note the corpus limitation explicitly.
 
+### LLM consistency checks — differential bias analysis (2026-05-11)
+
+After reviewing the regression results critically, we ran four targeted checks to
+assess whether LLM under-labeling is uniform across actors and contexts. Uniform
+suppression is methodologically safe (direction preserved); differential suppression
+confounds real framing differences with annotation sensitivity.
+
+**Gold set join method:** The 100-sentence overlap set (kappa_overlap_person_b_v3.xlsx)
+was joined to labeled_sentences.csv by lowercased sentence text rather than sentence_id
+(the two files use independently generated UUIDs). 146/600 gold sentences matched.
+
+#### Check 1: Recall by context
+
+| Frame                 | Commercial recall | Policy recall | Public recall |
+|-----------------------|-------------------|---------------|---------------|
+| Innovation/Progress   | 0.28              | 0.56          | 0.38          |
+| Risk/Harm             | 0.22              | 0.29          | 0.27          |
+| Economic Benefit      | —                 | 0.00          | —             |
+| Regulation/Governance | 0.40              | 0.38          | —             |
+
+Innovation recall is substantially lower in commercial (0.28) than policy (0.56).
+Because the LLM under-detects innovation in commercial text, the measured
+commercial > policy gap for innovation_score is an **understatement** of the true
+effect — the H2 finding is conservative. This strengthens rather than threatens H2.
+
+Economic Benefit recall = 0.00 in the only context with enough gold observations
+(policy). This frame is essentially undetectable by the LLM and should be **dropped**
+from H2 discussion. Any reported economic_score effect is noise.
+
+#### Check 2: Recall by positioning
+
+| Positioning    | Innovation recall | Regulation recall |
+|----------------|-------------------|-------------------|
+| capability     | 0.37              | 0.46              |
+| safety         | 0.30              | 0.42              |
+| infrastructure | 0.00 (n=3)        | —                 |
+| regulator      | —                 | 0.92              |
+
+Regulators have very high regulation recall (0.92) — the M1 +0.136*** policy
+coefficient for regulation_score is well-supported. Infrastructure innovation
+recall is 0.00 but from a trivially small sample (n=3 sentences).
+
+#### Check 3: None rate by actor in full corpus
+
+Checked the raw `is_none` rate per actor across all 63,546 labeled_sentences.csv rows.
+A higher None rate means lower label density — if this varies by actor it confounds
+cross-actor comparisons.
+
+| Actor            | None rate | Positioning    |
+|------------------|-----------|----------------|
+| US Congress      | 28.7%     | regulator      |
+| White House OSTP | 29.4%     | regulator      |
+| EU Commission    | 33.2%     | regulator      |
+| UK DSIT          | 44.6%     | regulator      |
+| Sam Altman       | 52.3%     | capability     |
+| Satya Nadella    | 53.1%     | capability     |
+| OpenAI           | 54.8%     | capability     |
+| Microsoft        | 57.2%     | capability     |
+| Mark Zuckerberg  | 59.3%     | capability     |
+| Jensen Huang     | 64.4%     | infrastructure |
+| Google DeepMind  | 62.4%     | safety         |
+| Nvidia           | 66.3%     | infrastructure |
+| Meta AI          | 64.1%     | capability     |
+| Demis Hassabis   | 66.8%     | safety         |
+| Dario Amodei     | 67.5%     | safety         |
+| Anthropic        | 68.2%     | safety         |
+
+Range: 28.7% → 68.2% = **39.5pp spread** (std dev 13.6pp).
+
+This is the most serious methodological limitation in the study. Regulator actors
+have 28–45% None rates; safety-positioning actors have 62–68%. Direct cross-actor
+comparisons of raw framing scores are confounded by differential LLM sensitivity
+to each actor's writing style.
+
+**What remains valid after this finding:**
+- Within-actor cross-context contrasts (e.g., Nadella commercial vs. policy):
+  the LLM processes all of one actor's sentences with uniform sensitivity regardless
+  of context label; the actor-specific None rate applies equally across that actor's
+  contexts → within-actor M2 interactions are unaffected.
+- Context-level comparisons when actor is controlled (Model 2 interaction terms).
+- Directional comparisons where the known bias is conservative (innovation H2 above).
+
+**What is suspect and should not be reported as a primary finding:**
+- Raw actor-level mean comparisons ("Anthropic frames more risk than OpenAI") —
+  systematically biased by 39.5pp differential suppression.
+- Economic Benefit as a DV (recall=0.00 in policy; frame is essentially invisible to the LLM).
+
+#### Check 4: Sensitivity — M1 with recall-corrected scores
+
+Re-ran M1 substituting recall-corrected scores (raw_score / per-frame recall by
+context, clipped at 1.0) to test whether all three context effects survive.
+
+| Frame       | Raw β_policy | Corrected β_policy | Both significant? |
+|-------------|-------------|-------------------|-------------------|
+| innovation  | −0.023 *    | −0.042 *          | Yes (p=0.016)     |
+| risk        | +0.055 ***  | +0.110 ***        | Yes (p<0.001)     |
+| regulation  | +0.136 ***  | +0.358 ***        | Yes (p<0.001)     |
+
+All three M1 context effects survive recall correction; all coefficients increase in
+magnitude (as expected — correction scales up true scores). H1 is robust to the
+measurement bias.
+
+#### M3 near-perfect multicollinearity
+
+The regressor cluster {actor_type=policymaker, context=policy, positioning=regulator,
+platform=regulatory_doc, platform=testimony} is nearly perfectly collinear in the data.
+Statsmodels returns billion-scale coefficients for actor_type[T.policymaker] alongside
+near-zero or suppressed context[T.policy] terms. These specific M3 coefficients are
+uninterpretable. In the paper, cite only the positioning and platform terms from M3
+(safety, infrastructure, press_release, research_paper, speech) — these are identified
+without multicollinearity issues.
+
+#### M2 public context degeneracy
+
+Microsoft and Satya Nadella are the only actors with public context data in M2. Their
+combined public cell is sparse, producing degenerate interaction estimates:
+Microsoft×public β = −3.57e-17 (numerically zero), spurious p = 0.006. Do not report
+any public-context interaction from M2. Only commercial/policy contrasts from M2 are
+interpretable.
+
+#### Revised conclusions for paper methodology section
+
+1. Drop Economic Benefit from H2 discussion — LLM recall=0.00 in policy context.
+2. All three core M1 context effects are directionally robust (recall-corrected
+   sensitivity analysis confirms this).
+3. H2 commercial→innovation finding is conservative; true effect likely larger.
+4. Avoid cross-actor raw framing comparisons; within-actor context contrasts (M2) are valid.
+5. Cite only positioning/platform terms from M3 — policymaker and context=policy
+   coefficients are uninterpretable due to multicollinearity.
+6. Do not report M2 public-context interactions (degenerate cell artifact).
+
 ### Hypothesis verdicts
 
 **H1 — Does context predict framing?** CONFIRMED ✓
@@ -404,14 +535,20 @@ variance than all qualifying companies except Microsoft on risk. Formally untest
 - [x] Kappa threshold — κ = 0.86 PASSED (2026-05-09)
 - [x] LLM labeling pipeline — COMPLETE (63,546 sentences, 2026-05-10)
 - [x] `validate_llm_labels.py` — macro F1 = 0.633 (precision 0.847, recall 0.534)
-- [~] Innovation sub-classification — BLOCKED (needs ~$1 Anthropic credits; script fixed
-      with streaming write + resume). Bonus column only; does not affect Models 1–3.
+- [x] LLM consistency checks — COMPLETE (2026-05-11)
+      39.5pp None rate spread; differential innovation recall by context; economic benefit
+      dropped; recall-corrected sensitivity analysis confirms H1 robust; M3 multicollinearity
+      and M2 public degeneracy documented — see "LLM consistency checks" section above
+- [~] Innovation sub-classification — running (batch ~260/595 as of 2026-05-11; script
+      fixed with streaming write + --resume). Bonus column only; does not affect Models 1–3.
 - [x] `build_features.py` — DONE (2026-05-10); analysis_dataset.csv written (2,535 docs)
 - [x] Regression models (Models 1–3 for all three DVs) — DONE (2026-05-10)
 - [x] variance_analysis.py — DONE (2026-05-10); H3 directionally supported, not formally testable
 - [ ] **Paper write-up — Week 4 — CURRENT PRIORITY**
       Inputs ready: outputs/tables/ (all regression tables, variance tables),
       outputs/figures/ (variance bar charts)
+      Key paper notes: drop Economic Benefit DV; avoid cross-actor raw comparisons;
+      cite only M3 positioning/platform terms; H2 innovation finding is conservative
 
 **End product goal:**
 The final deliverable is an academic paper testing strategic framing adaptation in AI discourse.

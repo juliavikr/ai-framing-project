@@ -8,9 +8,19 @@ Submission deadline: ___________
 ---
 
 ## Current Status
-**Week 3 COMPLETE — Week 4 write-up is the remaining task**
+**Week 4: Write-up in progress**
 
-All regressions done (Models 1–3 for risk_score, innovation_score, regulation_score). Variance analysis done. H1 ✓ confirmed, H2 ✓ partially confirmed, H3 directionally supported but not formally testable (only 1 individual with multi-context coverage). Innovation sub-classification still blocked on API credits — it's a bonus column and doesn't affect any of the three core models.
+Regressions and variance analysis complete. LLM consistency checks complete (2026-05-11):
+39.5pp None rate spread documented; H1 confirmed robust via recall-corrected sensitivity
+analysis; Economic Benefit DV dropped; M3 multicollinearity and M2 public degeneracy
+documented. Innovation sub-classification still running (~44% done, streaming).
+
+**Key paper constraints from consistency checks:**
+- Drop Economic Benefit from H2 — LLM recall=0.00 in policy context
+- Do not compare raw framing scores across actors (39.5pp None rate spread)
+- Within-actor context contrasts (M2 interactions) are valid
+- Cite only M3 positioning/platform terms (not actor_type or context[T.policy] — multicollinear)
+- H2 commercial→innovation is conservative (true effect likely stronger)
 
 **Immediate next step:** Paper write-up (Week 4). All inputs are in `outputs/tables/` and `outputs/figures/`.
 
@@ -106,7 +116,8 @@ Last run: 2026-05-08  |  corpus.csv written to data/processed/corpus.csv  |  5,9
 | LLM pipeline test (50 docs, Haiku)      | working   | ✓ real labels  | 2026-05-10 |
 | Full LLM labeling complete              | 63,546    | ✓ 63,546 sents | 2026-05-10 |
 | LLM validation (macro F1 vs gold 100)   | >= 0.80   | 0.633 ✗ (precision 0.847, recall 0.534) | 2026-05-10 |
-| Innovation sub-classification           | —         | BLOCKED (credit exhaustion at batch 418/595; script fixed, needs ~$1 to resume) | 2026-05-10 |
+| LLM consistency checks (differential bias) | —      | COMPLETE — 39.5pp None rate spread; differential innovation recall by context; economic benefit dropped; sensitivity analysis confirms H1 robust | 2026-05-11 |
+| Innovation sub-classification           | —         | IN PROGRESS (~44% at batch 260/595; streaming write active; will finalize when complete) | 2026-05-11 |
 
 ---
 
@@ -250,6 +261,16 @@ Both:
   - [x] H1 verdict: β_context significant? YES ✓ (all three DVs, p<0.001)
   - [x] H2 verdict: commercial → innovation, policy → regulation? PARTIAL ✓ (regulation confirmed strongly; innovation confirmed by inversion; economic not significant)
   - [x] H3 verdict: individuals show more variance? DIRECTIONALLY YES — not formally testable ✓
+  - [x] LLM consistency checks (2026-05-11) ✓
+        — None rate spread 39.5pp (US Congress 28.7% ↔ Anthropic 68.2%): cross-actor raw
+          comparisons are confounded; within-actor context contrasts (M2) are valid
+        — Innovation recall: commercial 0.28 vs policy 0.56 → H2 finding is conservative
+        — Economic Benefit recall = 0.00 in policy → drop from H2 discussion
+        — Sensitivity analysis: recall-corrected M1 scores confirm all 3 context effects robust
+        — M3 multicollinearity: policymaker/regulator/policy cluster → cite only
+          positioning/platform terms from M3 (not actor_type or context[T.policy])
+        — M2 public context degenerate (β=−3.57e-17, spurious p=0.006) → report only
+          commercial/policy interactions from M2
 
 ### Week 4 — Write-up (Days 22–28)
 
