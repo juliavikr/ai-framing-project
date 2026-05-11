@@ -135,7 +135,8 @@ Label distribution across 63,546 sentences: Innovation/Progress 18.7% | Regulati
 
 ### 3. Regression analysis
 
-We estimate three OLS models using `statsmodels`:
+We estimate three OLS models using `statsmodels`, run separately for `risk_score`,
+`innovation_score`, and `regulation_score`:
 
 - **Model 1:** Does context predict framing? (`Frame ~ Context + PostChatGPT`)
 - **Model 2:** Strategic adaptation — do actors shift across contexts?
@@ -143,9 +144,33 @@ We estimate three OLS models using `statsmodels`:
 - **Model 3:** Full controls — actor type, positioning, platform, time
   (`Frame ~ ActorType + Context + Positioning + Platform + PostChatGPT`)
 
-Each model is estimated separately for `risk_score`, `innovation_score`, and
-`regulation_score` as dependent variables. We also compute per-actor framing
-variance across contexts to directly test H3.
+**Key findings (N=2,535 docs after quality filter):**
+
+**H1 CONFIRMED** — Context is significant in Model 1 for all three DVs (p < 0.001).
+Policy documents have substantially more risk (+0.055) and regulation (+0.136) framing
+than commercial documents; public documents have the least risk framing (−0.043).
+
+**H2 PARTIALLY CONFIRMED** — Policy → regulation (β=+0.136***) and policy → risk
+(β=+0.055***) both confirmed. Commercial → innovation confirmed by inversion
+(policy β=−0.023*). Commercial → economic benefit not significant in any model —
+economic framing is low across all contexts, possibly due to LLM under-detection
+(recall 0.375 in validation).
+
+**H3 DIRECTIONALLY SUPPORTED, not formally testable** — Only 1 individual (Satya
+Nadella) has sufficient multi-context coverage for variance analysis. Nadella shows
+higher cross-context innovation variance (σ=0.129) than all qualifying companies,
+substantially above his paired institution Microsoft (σ=0.031). Sample too small for
+t-test; presented as illustrative.
+
+**Notable interaction (Model 2):** Satya Nadella × policy context β=+0.271*** on
+innovation score — his policy documents are far more innovation-framed than his
+commercial ones, the strongest single instance of strategic adaptation in the corpus.
+
+Model 2 is restricted to 3 actors (Microsoft, OpenAI, Satya Nadella) with ≥50 docs
+in ≥2 contexts after the public-context ceiling. The public corpus at 4.0% is the
+binding constraint on cross-context analysis. Regulation framing achieves the highest
+explained variance of any DV (Model 3 R²=0.221), driven by positioning and platform
+in addition to context.
 
 ---
 
@@ -165,9 +190,10 @@ ai-framing-project/
 │   ├── processed/
 │   │   └── corpus.csv          ← master dataset (5,925 docs)
 │   └── annotation/
-│       ├── clean_sentences.csv ← 63,546 filtered sentences
-│       ├── gold_set_*.csv      ← stratified annotator samples
-│       └── labeled_full.csv    ← LLM-labeled corpus (pending)
+│       ├── clean_sentences.csv      ← 63,546 filtered sentences
+│       ├── gold_set_*.csv           ← stratified annotator samples
+│       ├── labeled_sentences.csv    ← 63,546 LLM-labeled sentences
+│       └── labeled_documents.csv   ← doc-level framing scores
 ├── src/
 │   ├── scraping/               ← scrapers for each source type + PDF ingest
 │   ├── processing/             ← dedup, corpus builder, sentence cleaner
@@ -226,5 +252,5 @@ python src/models/variance_analysis.py
 ## Status
 - [x] Week 1 — Data collection (5,925 docs, 16 actors)
 - [x] Week 2 — Annotation (κ = 0.86; LLM labeling complete; validation F1 = 0.633)
-- [~] Week 3 — Analysis (innovation sub-classification running; regression pending)
-- [ ] Week 4 — Write-up
+- [x] Week 3 — Analysis (Models 1–3 complete; H1 ✓, H2 partial ✓, H3 directional ✓)
+- [~] Week 4 — Write-up (IN PROGRESS)

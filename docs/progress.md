@@ -106,7 +106,7 @@ Last run: 2026-05-08  |  corpus.csv written to data/processed/corpus.csv  |  5,9
 | LLM pipeline test (50 docs, Haiku)      | working   | ✓ real labels  | 2026-05-10 |
 | Full LLM labeling complete              | 63,546    | ✓ 63,546 sents | 2026-05-10 |
 | LLM validation (macro F1 vs gold 100)   | >= 0.80   | 0.633 ✗ (precision 0.847, recall 0.534) | 2026-05-10 |
-| Innovation sub-classification           | —         | IN PROGRESS (~4h) | 2026-05-10 |
+| Innovation sub-classification           | —         | BLOCKED (credit exhaustion at batch 418/595; script fixed, needs ~$1 to resume) | 2026-05-10 |
 
 ---
 

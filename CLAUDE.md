@@ -7,7 +7,7 @@ To what extent do actors adapt their framing of AI across contexts
 
 **Team:** 2 people | **Timeline:** 4 weeks | **Target documents: ~6,000
 
-## Current Status — Week 2: LLM Labeling IN PROGRESS (2026-05-10)
+## Current Status — Week 4: Write-up (2026-05-11)
 
 | Milestone | State |
 |-----------|-------|
@@ -20,9 +20,13 @@ To what extent do actors adapt their framing of AI across contexts
 | Kappa Round 2 (κ = 0.37) | FAIL — root cause: corpus noise, not guidelines |
 | Corpus cleaning | COMPLETE — clean_corpus.py (5 filters, 69.5% removed) |
 | Kappa Round 3 (κ = 0.86) | PASS ✓ — 2026-05-09 |
-| LLM labeling | IN PROGRESS — ~85% complete (claude-haiku-4-5-20251001) |
-| validate_llm_labels.py | NEXT — after labeling completes |
-| Regression | PENDING |
+| LLM labeling | COMPLETE — 63,546 sentences (claude-haiku-4-5-20251001) |
+| validate_llm_labels.py | COMPLETE — macro F1 = 0.633 (precision 0.847, recall 0.534) |
+| build_features.py | COMPLETE — 2,535 docs in analysis_dataset.csv |
+| Regression (Models 1–3, 3 DVs) | COMPLETE — 2026-05-10; all tables in outputs/tables/ |
+| Variance analysis | COMPLETE — H3 directionally supported; outputs/figures/ |
+| Innovation sub-classification | BLOCKED — needs ~$1 Anthropic credits; bonus column only |
+| Paper write-up | IN PROGRESS — Week 4 |
 
 ---
 
@@ -74,7 +78,8 @@ ai-framing-project/
 │       ├── gold_set_merged.csv
 │       ├── kappa_overlap_person_a_v3.xlsx  ← Round 3 overlap (clean pool)
 │       ├── kappa_overlap_person_b_v3.xlsx
-│       └── labeled_full.csv
+│       ├── labeled_sentences.csv           ← 63,546 LLM-labeled sentences
+│       └── labeled_documents.csv          ← doc-level framing scores (regression input)
 │
 ├── src/
 │   ├── config.py
@@ -233,7 +238,7 @@ Balance rules — verify before running regression:
 
 ---
 
-## Actual Corpus State (as of Week 2)
+## Actual Corpus State (as of Week 3)
 
 **Documents:** 5,925 (98.8% of target) — loaded to Snowflake and corpus.csv
 
