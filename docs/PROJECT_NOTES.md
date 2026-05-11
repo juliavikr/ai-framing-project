@@ -303,6 +303,38 @@ Mean framing scores per context before regression:
 These descriptive means alone visually confirm H1 and H2 (policy higher on risk and
 regulation; commercial higher on innovation relative to policy).
 
+### DV selection — why 3 of 5 labels
+
+The annotation scheme produces 5 binary labels per sentence. Only 3 are used as
+regression DVs. The two exclusions are principled, not arbitrary.
+
+**Economic Benefit — excluded on measurement grounds**
+- LLM validation: overall recall = 0.375; precision = 1.000 (when detected, always correct)
+- Consistency check: recall = 0.00 in the policy context — the frame is effectively
+  invisible to the LLM in exactly the context where cross-context variation would be
+  tested. Any regression coefficient on economic_score in a model containing context
+  would be measuring annotation dropout, not real framing.
+- Corpus frequency: 6.0% of sentences → further limits statistical power.
+- Decision: excluded from primary results. Could be run as a robustness check with
+  explicit caveats if a reviewer requests it (regression.py supports --dv economic_score).
+
+**Existential/AGI — excluded on frequency grounds**
+- Only 1.1% of sentences carry this label.
+- At document level, framing scores this sparse produce a near-zero DV with negligible
+  variance. OLS regressions on it would be severely underpowered and coefficients
+  uninterpretable.
+- The frame is also conceptually concentrated in a few actors (Amodei essays, Altman
+  long-form pieces) — it is an actor-specific signal rather than a cross-corpus pattern
+  suitable for a multi-actor comparative regression.
+- Decision: excluded from primary results. Same caveat applies — can be run on request.
+
+**The three retained DVs (risk_score, innovation_score, regulation_score):**
+- Sentence-level frequency: 8.7–18.7% (sufficient variance at document level)
+- LLM recall: 0.38–0.55 macro across contexts (not zero in any key context)
+- Direct theoretical alignment with H1/H2: the core research question is whether
+  commercial contexts produce more innovation framing and policy contexts produce more
+  risk/regulation framing — these three frames map exactly onto that contrast.
+
 ### Regression results summary
 
 **risk_score** (M1 R²=0.041, M3 R²=0.079):
