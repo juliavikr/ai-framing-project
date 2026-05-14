@@ -1,6 +1,10 @@
 """
 scrape_elon_musk.py — Multi-source scraper for Elon Musk documents.
 
+NOTE: Musk was excluded from the final corpus (only 21 accessible documents —
+insufficient for cross-context analysis). This scraper is archived for reference;
+do not include its output in the pipeline.
+
 Sources:
   1. rev.com  (PUBLIC)     — transcript pages, AI-filtered (3+ mentions)
   2. EDGAR Tesla 8-K       (COMMERCIAL) — quarterly earnings press releases

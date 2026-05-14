@@ -5,14 +5,14 @@ requests==2.31.0
 beautifulsoup4==4.12.3
 lxml==5.1.0
 python-dotenv==1.0.1
-uuid==1.30
 
-# NLP
+# NLP / text processing
 nltk==3.8.1
-sentence-transformers==2.5.1
+langdetect==1.0.9
+openpyxl==3.1.2
 
-# Annotation
-scikit-learn==1.4.0  # for Cohen's Kappa
+# Annotation metrics
+scikit-learn==1.4.0
 
 # Stats / regression
 statsmodels==0.14.1
@@ -26,11 +26,13 @@ matplotlib==3.8.3
 seaborn==0.13.2
 
 # API clients
-anthropic==0.21.3
+anthropic==0.100.0          # Claude Haiku 4.5 labeling + sub-classification
 newsapi-python==0.2.7
 youtube-transcript-api==0.6.3
 pdfplumber==0.11.4
 
-# Notebook
-jupyter==1.0.0
-ipykernel==6.29.3
+# Alternative LLM validation (optional — only needed to run validate_alternative_llm.py)
+# pip install openai groq google-genai
+openai==1.12.0
+groq==1.0.0
+google-genai==1.47.0

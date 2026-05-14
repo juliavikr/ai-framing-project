@@ -1,7 +1,7 @@
 """
 label_with_llm.py — Label all corpus sentences with an LLM (5 annotation frames).
 
-Reads clean_sentences.csv, labels in batches via the OpenAI API, aggregates
+Reads clean_sentences.csv, labels in batches via the Anthropic API, aggregates
 sentence-level labels to document-level framing scores, and writes two output files:
   data/annotation/labeled_sentences.csv
   data/annotation/labeled_documents.csv
