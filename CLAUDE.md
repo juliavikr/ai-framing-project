@@ -149,7 +149,7 @@ Every row in corpus.csv — no extra columns, no missing columns.
 | doc_id       | string | UUID4, auto-generated at ingest                                     |
 | actor        | string | Exact name from ACTORS dict in config.py                            |
 | actor_type   | string | individual / company / policymaker                                  |
-| positioning  | string | capability / safety / infrastructure / contrarian / regulator       |
+| positioning  | string | capability / safety / infrastructure / regulator                    |
 | context      | string | commercial / policy / public                                        |
 | platform     | string | blog / earnings_call / testimony / regulatory_doc /                 |
 |              |        | interview / speech / press_release / research_paper                 |
@@ -255,7 +255,7 @@ Balance rules — verify before running regression:
 
 ## Actual Corpus State (as of Week 3)
 
-**Documents:** 5,925 (98.8% of target) — loaded to Snowflake and corpus.csv
+**Documents:** 5,946 (99.1% of target) — loaded to Snowflake and corpus.csv
 
 | Actor type  | Docs  | Share | Target | Status |
 |-------------|-------|-------|--------|--------|
@@ -331,26 +331,13 @@ Model 3 — Full controls
   Frame_d = β0 + β1·ActorType_d + β2·Context_d + β3·Positioning_d
           + β4·Platform_d + β5·PostChatGPT_d + ε_d
 
-Model 4 — Individual vs company pairs (bonus if time allows)
-  Frame_d = β0 + β1·IsIndividual_d + β2·Context_d
-          + β3·(IsIndividual × Context)_d + ε_d
-
 Run Models 1–3 for each DV: risk_score, innovation_score, regulation_score
 
 ---
 
 ## Annotation Frames (5 labels)
-| ID | Label                | Short definition                                      |
-|----|----------------------|-------------------------------------------------------|
-| 1  | Innovation/Progress  | AI as transformative, enabling, advancing society     |
-| 2  | Economic Benefit     | Jobs, growth, productivity, competitive advantage     |
-| 3  | Risk/Harm            | Near-term harms: bias, job loss, misuse, surveillance |
-| 4  | Regulation/Governance| Policy, laws, oversight, compliance, governance       |
-| 5  | Existential/AGI      | Long-term risk, superintelligence, x-risk, AGI        |
-
-One sentence → one or more labels, or None
-Full guidelines: docs/annotation_guidelines.md
-Kappa target: >= 0.70 before LLM labeling begins
+5 frames (multi-label per sentence) + None. Full definitions, examples, and edge-case
+rules: **docs/annotation_guidelines.md**. Kappa target: ≥ 0.70 before LLM labeling.
 
 ---
 

@@ -628,7 +628,7 @@ Concrete examples from results:
   the average context shift.
 
 **Reference categories:** context = commercial · positioning = capability · platform = blog ·
-actor_type = individual
+actor_type = company
 
 **R² interpretation:** Fraction of total DV variance explained by the model.
 Social science text analysis norms: R²=0.05–0.15 for a single contextual predictor;

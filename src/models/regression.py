@@ -8,7 +8,8 @@ Runs three models for a given dependent variable (framing score):
   Model 3 (full controls):Frame ~ ActorType + Context + Positioning + Platform + PostChatGPT
 
 Reference levels: context=commercial, actor_type=company, positioning=capability,
-                  platform=blog (most frequent; statsmodels drops first alphabetically).
+                  platform=blog (alphabetically first among platform values; set explicitly
+                  via pd.Categorical ordering for context and actor_type, implicit for platform).
 
 Usage:
     python src/models/regression.py --dv risk_score

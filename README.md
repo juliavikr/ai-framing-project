@@ -7,7 +7,7 @@
 
 This project tests whether AI industry actors — CEOs, tech companies, and government
 institutions — strategically adapt how they frame AI depending on their audience.
-We scraped 5,925 documents from 16 actors across commercial, policy, and public contexts,
+We scraped 5,946 documents from 16 actors across commercial, policy, and public contexts,
 annotated 63,546 sentences using Claude Haiku (κ = 0.86 inter-annotator agreement,
 macro F1 = 0.633 vs. human gold), and ran OLS regressions on document-level framing proportions.
 
@@ -102,7 +102,7 @@ accessible sources, insufficient for cross-context analysis.*
 
 ## How we built it
 
-### 1. Data collection — 5,925 documents
+### 1. Data collection — 5,946 documents
 
 We built a scraping pipeline in Python using `requests` and `BeautifulSoup`,
 collecting documents from 30+ distinct sources including company blogs, the Wayback
@@ -190,7 +190,8 @@ Model 2 is restricted to 3 actors (Microsoft, OpenAI, Satya Nadella) with ≥50 
 in ≥2 contexts after the public-context ceiling. The public corpus at 4.0% is the
 binding constraint on cross-context analysis. Regulation framing achieves the highest
 explained variance of any DV (Model 3 R²=0.221), driven by positioning and platform
-in addition to context.
+in addition to context. Note: M3 actor_type and context[T.policy] coefficients are
+affected by multicollinearity and are not cited as primary findings (see PROJECT_NOTES §4.7).
 
 ---
 

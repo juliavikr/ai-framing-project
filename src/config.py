@@ -36,7 +36,7 @@ PLATFORMS = [
 # ── Actor Registry ─────────────────────────────────────────────────────────────
 # Each actor:
 #   type:        individual / company / policymaker
-#   positioning: capability / safety / infrastructure / contrarian / regulator
+#   positioning: capability / safety / infrastructure / regulator
 #   pair:        individual<->company pair for secondary analysis (None if none)
 #   target:      total document target
 #   contexts:    per-context doc targets
